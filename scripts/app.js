@@ -401,7 +401,7 @@ function buildUnifiedCatalogItems() {
         item_category: item.category,
         item_type: "excursion"
       });
-      window.location.href = `${buildExcursionPagePath(item)}#request`;
+      window.location.href = buildExcursionPagePath(item);
     }
   }));
 
@@ -415,7 +415,7 @@ function buildUnifiedCatalogItems() {
     image: getRentalImages(item)[0],
     searchIndex: item._searchIndex || buildRentalSearchIndex(item),
     onSelect: () => {
-      window.location.href = `${buildRentalPagePath(item)}#request`;
+      window.location.href = buildRentalPagePath(item);
     }
   }));
 
@@ -429,7 +429,7 @@ function buildUnifiedCatalogItems() {
     image: getServiceImage(item),
     searchIndex: item._searchIndex || buildServiceSearchIndex(item),
     onSelect: () => {
-      window.location.href = `${buildServicePagePath(item)}#request`;
+      window.location.href = buildServicePagePath(item);
     }
   }));
 
@@ -489,6 +489,7 @@ function renderUnifiedCards(items) {
     const node = refs.cardTemplate.content.cloneNode(true);
     const card = node.querySelector(".tour-card");
     const image = node.querySelector(".tour-card-image");
+    const goToCard = () => item.onSelect();
 
     image.src = item.image || FALLBACK_IMAGE;
     image.alt = item.title;
@@ -498,8 +499,29 @@ function renderUnifiedCards(items) {
     node.querySelector(".tour-card-overview").textContent = item.overview;
     node.querySelector(".tour-card-price").textContent = item.priceLabel;
 
-    const selectBtn = node.querySelector('[data-action="select"]');
-    selectBtn.addEventListener("click", item.onSelect);
+    const ctaButton = node.querySelector('[data-action="select"]');
+    ctaButton.setAttribute("aria-label", `Подробнее: ${item.title}`);
+    ctaButton.innerHTML = '<span class="cta-arrow" aria-hidden="true">→</span>';
+    ctaButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      goToCard();
+    });
+
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Открыть подробности: ${item.title}`);
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("button")) {
+        return;
+      }
+      goToCard();
+    });
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        goToCard();
+      }
+    });
 
     card.style.animationDelay = `${Math.min(320, index * 60)}ms`;
     index += 1;

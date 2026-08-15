@@ -466,17 +466,19 @@
     </dialog>
 
     <template id="cardTemplate">
-      <article class="tour-card reveal-up">
-        <img class="tour-card-image" alt="" loading="lazy" decoding="async" fetchpriority="low" />
+      <article class="tour-card reveal-up" tabindex="0" role="button" aria-label="Подробнее">
+        <div class="tour-card-media">
+          <span class="tour-card-badge rental-card-meta"></span>
+          <img class="tour-card-image" alt="" loading="lazy" decoding="async" fetchpriority="low" />
+        </div>
         <div class="tour-card-body">
           <h3 class="tour-card-title"></h3>
-          <p class="rental-card-meta"></p>
           <p class="tour-card-overview"></p>
           <div class="tour-card-foot">
             <p class="tour-card-price"></p>
-            <div class="tour-card-actions">
-              <button class="btn btn-small btn-primary" type="button" data-action="select">Забронировать</button>
-            </div>
+            <button class="tour-card-cta" type="button" data-action="select" aria-label="Подробнее">
+              <span class="cta-arrow" aria-hidden="true">→</span>
+            </button>
           </div>
         </div>
       </article>
