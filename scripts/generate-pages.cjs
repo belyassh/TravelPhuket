@@ -158,6 +158,10 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
         display: grid;
         gap: 1.8rem;
         padding-bottom: 2.8rem;
+        width: min(1120px, calc(100% - 1.2rem));
+        margin-inline: auto;
+        max-width: 100%;
+        min-width: 0;
       }
       .seo-page {
         border-radius: var(--radius-lg);
@@ -165,13 +169,27 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
         background: rgba(255, 254, 248, 0.9);
         box-shadow: var(--shadow);
         padding: clamp(1.2rem, 2.5vw, 2rem);
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
       }
-      .seo-head { margin-bottom: 0.9rem; }
-      .seo-head h1 { margin: 0 0 0.6rem; }
+      .seo-head {
+        margin-bottom: 0.9rem;
+        min-width: 0;
+      }
+      .seo-head h1 {
+        margin: 0 0 0.6rem;
+        max-width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
       .seo-head p {
         color: var(--muted);
         max-width: 760px;
         line-height: 1.5;
+        overflow-wrap: anywhere;
       }
       .seo-head-actions {
         margin-top: 0.9rem;
@@ -181,7 +199,14 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
       }
       .seo-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 1.5rem; align-items: stretch; }
       .seo-grid .seo-card { display: flex; flex-direction: column; height: 100%; }
-      .seo-card { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1.2rem; background: var(--surface); margin-bottom: 1.5rem; }
+      .seo-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 1.2rem;
+        background: var(--surface);
+        margin-bottom: 1.5rem;
+        min-width: 0;
+      }
       @media (min-width: 1401px) {
         .seo-grid { grid-template-columns: repeat(3, 1fr); }
       }
@@ -205,7 +230,14 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
       .itinerary-step { display: flex; gap: 0.8rem; padding: 0.6rem; background: var(--bg); border-radius: var(--radius-sm); align-items: flex-start; }
       .itinerary-time { min-width: 60px; font-weight: 600; color: var(--brand); font-size: 0.9rem; }
       .itinerary-activity { flex: 1; font-size: 0.9rem; }
-      .seo-breadcrumbs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+      .seo-breadcrumbs {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
       .seo-breadcrumbs a { color: var(--brand); }
       .seo-back-top { margin-bottom: 0.9rem; }
       .muted { opacity: 0.85; }
@@ -216,12 +248,14 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        min-width: 0;
       }
       .program-card {
         border: 1px solid var(--line);
         border-radius: var(--radius-md);
         padding: 1rem;
         background: var(--surface);
+        min-width: 0;
       }
       .program-card h3 {
         margin: 0 0 0.5rem;
@@ -287,8 +321,25 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
         }
       }
       @media (max-width: 430px) {
+        .seo-main {
+          width: min(1120px, calc(100% - 0.9rem));
+        }
         .seo-page {
           padding: 0.85rem;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .field,
+        .field-wide,
+        .request-form,
+        .request {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+        .field-wide {
+          grid-column: auto;
         }
         .seo-back-top .btn,
         .seo-request-wrap .btn,

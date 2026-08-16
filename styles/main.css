@@ -1189,6 +1189,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     grid-template-columns: 1fr;
   }
 
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field,
+  .field-wide,
+  .request-form,
+  .request {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .field-wide {
+    grid-column: auto;
+  }
+
   .tour-card-foot,
   .form-actions {
     flex-direction: column;

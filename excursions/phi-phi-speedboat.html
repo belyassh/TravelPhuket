@@ -46,6 +46,10 @@
         display: grid;
         gap: 1.8rem;
         padding-bottom: 2.8rem;
+        width: min(1120px, calc(100% - 1.2rem));
+        margin-inline: auto;
+        max-width: 100%;
+        min-width: 0;
       }
       .seo-page {
         border-radius: var(--radius-lg);
@@ -53,13 +57,28 @@
         background: rgba(255, 254, 248, 0.9);
         box-shadow: var(--shadow);
         padding: clamp(1.2rem, 2.5vw, 2rem);
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
       }
-      .seo-head { margin-bottom: 0.9rem; }
-      .seo-head h1 { margin: 0 0 0.6rem; }
+      .seo-head {
+        margin-bottom: 0.9rem;
+        min-width: 0;
+      }
+      .seo-head h1 {
+        margin: 0 0 0.6rem;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
       .seo-head p {
         color: var(--muted);
         max-width: 760px;
         line-height: 1.5;
+        overflow-wrap: anywhere;
       }
       .seo-head-actions {
         margin-top: 0.9rem;
@@ -93,7 +112,14 @@
       .itinerary-step { display: flex; gap: 0.8rem; padding: 0.6rem; background: var(--bg); border-radius: var(--radius-sm); align-items: flex-start; }
       .itinerary-time { min-width: 60px; font-weight: 600; color: var(--brand); font-size: 0.9rem; }
       .itinerary-activity { flex: 1; font-size: 0.9rem; }
-      .seo-breadcrumbs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+      .seo-breadcrumbs {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
       .seo-breadcrumbs a { color: var(--brand); }
       .seo-back-top { margin-bottom: 0.9rem; }
       .muted { opacity: 0.85; }
@@ -175,8 +201,25 @@
         }
       }
       @media (max-width: 430px) {
+        .seo-main {
+          width: min(1120px, calc(100% - 0.9rem));
+        }
         .seo-page {
           padding: 0.85rem;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .field,
+        .field-wide,
+        .request-form,
+        .request {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+        .field-wide {
+          grid-column: auto;
         }
         .seo-back-top .btn,
         .seo-request-wrap .btn,
