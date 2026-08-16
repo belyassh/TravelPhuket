@@ -37,6 +37,7 @@ const refs = {
   mainNav: document.querySelector("#mainNav"),
   mobileMenuToggle: document.querySelector("#mobileMenuToggle"),
   mobileMenuClose: document.querySelector("#mobileMenuClose"),
+  backToTopButton: document.querySelector("#backToTop"),
   detailsDialog: document.querySelector("#detailsDialog"),
   detailsContent: document.querySelector("#detailsContent"),
   dialogClose: document.querySelector("#dialogClose"),
@@ -134,7 +135,19 @@ function bindNavigationEvents() {
     queueHorizontalClamp();
   });
 
-  window.addEventListener("scroll", queueHorizontalClamp, { passive: true });
+  window.addEventListener("scroll", () => {
+    queueHorizontalClamp();
+
+    if (refs.backToTopButton) {
+      refs.backToTopButton.classList.toggle("is-visible", window.scrollY > 420);
+    }
+  }, { passive: true });
+
+  if (refs.backToTopButton) {
+    refs.backToTopButton.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 
   window.addEventListener("touchend", () => {
     queueHorizontalClamp();
