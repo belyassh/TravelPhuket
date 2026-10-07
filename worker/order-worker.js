@@ -59,7 +59,8 @@ export default {
       return json({ ok: false, error: "not_configured" }, 500, cors);
     }
 
-    const results = await Promise.all(chatIds.map((chatId) => sendToTelegram(env.TELEGRAM_BOT_TOKEN, chatId, text)));
+    const replyUrl = buildReplyUrl(body.contact);
+    const results = await Promise.all(chatIds.map((chatId) => sendToTelegram(env.TELEGRAM_BOT_TOKEN, chatId, text, replyUrl)));
     const delivered = results.filter(Boolean).length;
 
     if (!delivered) {
@@ -70,16 +71,33 @@ export default {
   }
 };
 
-async function sendToTelegram(token, chatId, text) {
+// Кнопка под заявкой: открывает чат с клиентом в выбранном им мессенджере
+function buildReplyUrl(contact) {
+  if (!contact || typeof contact !== "object") return null;
+  const digits = String(contact.phone || "").replace(/\D/g, "");
+
+  if (contact.method === "whatsapp" && digits.length >= 7 && digits.length <= 15) {
+    return { text: "Ответить в WhatsApp", url: `https://wa.me/${digits}` };
+  }
+
+  if (contact.method === "telegram") {
+    const nick = String(contact.nick || "").replace(/^@+/, "");
+    if (/^[A-Za-z0-9_]{5,32}$/.test(nick)) return { text: "Ответить в Telegram", url: `https://t.me/${nick}` };
+    if (digits.length >= 7 && digits.length <= 15) return { text: "Ответить в Telegram по номеру", url: `https://t.me/+${digits}` };
+  }
+
+  return null;
+}
+
+async function sendToTelegram(token, chatId, text, reply) {
   try {
+    const payload = { chat_id: chatId, text: `🆕 ${text}`, disable_web_page_preview: true };
+    if (reply) payload.reply_markup = { inline_keyboard: [[{ text: reply.text, url: reply.url }]] };
+
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: `🆕 ${text}`,
-        disable_web_page_preview: true
-      })
+      body: JSON.stringify(payload)
     });
     return response.ok;
   } catch {

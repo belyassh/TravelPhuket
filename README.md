@@ -1,114 +1,47 @@
-# Niko Travel Phuket
+# Niko Phuket
 
-Сайт-витрина туристического агентства на Пхукете с единой каталоговой лентой: экскурсии, аренда и дополнительные услуги в одном интерфейсе.
+Витрина экскурсий, аренды и услуг на Пхукете: каталог, карточки, корзина и отправка заявок в Telegram-бота.
+Статический сайт без зависимостей: сборка одним Node-скриптом, деплой на GitHub Pages.
 
-Проект построен на Vite, контент управляется JSON-данными, а SEO-страницы карточек и разделов генерируются автоматически перед `dev` и `build`.
+## Воронка
 
-## Что реализовано
-
-- Единый каталог на главной: экскурсии, аренда, услуги.
-- Табы категорий: `Все`, `Морские`, `Наземные`, `Шоу`, `Бордеран и визаран`, `Аренда`, `Другие услуги`.
-- Полнотекстовый поиск по каталогу.
-- SEO-страницы карточек и разделов (генерация из JSON).
-- Форма подбора на главной странице.
-- Корзина заявок: экскурсии, аренда и услуги добавляются со страниц карточек (программа, дата, взрослые/дети), корзина общая для всех страниц.
-- Оформление: имя, телефон, отель для трансфера, затем выбор канала: Telegram-бот (автоматически), личка в Telegram или WhatsApp.
-- Передача UTM и click-id параметров в заявки.
-- Событие `generate_lead` для аналитики/рекламы.
-- Адаптивная верстка для мобильных устройств и десктопа.
-
-## Технологии
-
-- Vite 5
-- Vanilla JS (ES modules)
-- HTML + CSS
-- Node.js script для генерации статических страниц
-
-## Быстрый старт
-
-```bash
-npm install
-npm run dev
-```
-
-По умолчанию локальный адрес: `http://localhost:5173`.
+каталог / поиск / меню → карточка → дата, гости → «Добавить в корзину» → «Выбрать ещё» (возврат в тот же каталог с тем же поиском) → корзина → имя, телефон, WhatsApp или Telegram → заявка в бота → окно «Менеджер свяжется с вами в рабочие часы».
 
 ## Команды
 
 ```bash
-npm run dev      # predev -> генерация страниц, затем запуск Vite
-npm run build    # prebuild -> генерация страниц, затем production build
-npm run preview  # локальный просмотр dist
+npm run build     # собирает сайт в dist/
+npm run preview   # сборка + локальный сервер на http://localhost:5173
 ```
 
-## Структура проекта
+Node.js 18+. Устанавливать пакеты не нужно.
+
+## Структура
 
 | Путь | Назначение |
 | --- | --- |
-| index.html | Главная страница и шаблон карточки каталога |
-| styles/main.css | Основные стили и адаптивные брейкпоинты |
-| scripts/app.js | Логика каталога, фильтров, формы подбора и аналитики |
-| scripts/cart.js | Корзина и отправка заявок (копируется в `public/scripts/`) |
-| worker/ | Cloudflare Worker: заявки в Telegram-бота |
-| scripts/generate-pages.cjs | Генерация SEO-страниц и sitemap |
-| data/excursions.json | Данные экскурсий + конфигурация агентства |
-| data/rentals.json | Данные аренды |
-| data/services.json | Данные дополнительных услуг |
-| excursions/ | Сгенерированные страницы экскурсий (корень для прямых маршрутов) |
-| rental/ | Сгенерированные страницы аренды (корень для прямых маршрутов) |
-| services/ | Сгенерированные страницы услуг (корень для прямых маршрутов) |
-| public/excursions/ | Копии страниц для сборки Vite |
-| public/rental/ | Копии страниц для сборки Vite |
-| public/services/ | Копии страниц для сборки Vite |
-| robots.txt, sitemap.xml, 404.html | Базовый SEO и служебные страницы |
+| `data/site.json` | Контакты, часы работы, адрес воркера, ID аналитики |
+| `data/excursions.json`, `rentals.json`, `services.json` | Каталог. После правки достаточно `npm run build` |
+| `scripts/build.cjs` | Генератор всех страниц, sitemap и robots |
+| `src/styles/main.css` | Единый файл стилей |
+| `src/scripts/site.js` | Фильтр и поиск, форма бронирования, корзина, отправка |
+| `content/` | Тексты политик (HTML-фрагменты) |
+| `static/` | Копируется в корень сайта: логотип, favicon, CNAME, og-картинка |
+| `worker/` | Cloudflare Worker: заявки в Telegram-бота. Настройка в `worker/README.md` |
 
-## Как управлять контентом
+## Что нужно заполнить перед запуском
 
-1. Обновите данные в JSON:
-- `data/excursions.json`
-- `data/rentals.json`
-- `data/services.json`
-2. Запустите `npm run dev` или `npm run build`.
-3. Генератор пересоберет карточки, разделы и sitemap автоматически.
+1. В `data/site.json`: `contacts.whatsapp` (номер цифрами) и `orders.endpoint` (адрес воркера).
+2. Создать бота и воркер: `worker/README.md`.
 
-## Важные поля конфигурации
+Пока `orders.endpoint` пуст, форма корзины покажет ошибку отправки и предложит написать напрямую в WhatsApp или Telegram.
 
-В `data/excursions.json`:
+## Как править каталог
 
-- `agency.currency` - валюта цен (`USD`, `EUR` и т.д.)
-- `telegram.managerUsername` - username менеджера без `@`
-- `orders.endpoint` - адрес Cloudflare Worker, который пересылает заявки в Telegram-бота (см. `worker/README.md`)
-- `orders.whatsappNumber` - номер WhatsApp менеджера цифрами, например `66812345678`
+Поля экскурсии в `data/excursions.json`: `slug`, `category` (`sea`, `land`, `show`), `topRank` (порядок на главной), `title`, `overview`, `description`, `programs[]` (`title`, `departure`, `price`, `priceLabel`, `pickupZones`, `notes`), `itinerary`, `included`, `bring`, `requirements`, `images`, `tags`.
+`priceLabel` показывается как есть, если в нём есть сумма в THB; иначе цена строится из поля `price`.
+Новые страницы, пункты меню и sitemap появляются автоматически.
 
-## Лиды и аналитика
+## SEO
 
-При отправке форм передаются:
-
-- UTM: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`
-- Click IDs: `gclid`, `fbclid`, `yclid`, `msclkid`
-- Контекст: `landingPage`, `lastPage`, `referrer`
-
-Заявка собирается в корзине (`scripts/cart.js`) и уходит одним сообщением. Настройка бота и воркера: `worker/README.md`.
-
-## Деплой
-
-Автодеплой на GitHub Pages настроен через workflow:
-
-- `.github/workflows/deploy-pages.yml`
-
-Обычно достаточно push в `main`: pipeline выполняет `npm ci` + `npm run build` и публикует `dist`.
-
-## SEO чек перед запуском на домене
-
-Перед релизом на свой домен проверьте:
-
-1. Canonical и OG URL в `index.html`.
-2. URL в `robots.txt` (строка `Sitemap`).
-3. URL в `sitemap.xml`.
-4. Наличие `CNAME` в `public/` (если используется GitHub Pages custom domain).
-
-## Примечания
-
-- Не открывайте `index.html` напрямую из файловой системы: нужен локальный сервер.
-- Генерация страниц выполняется автоматически через `predev`/`prebuild`.
-- В проекте предусмотрены fallback-изображения для карточек без валидных URL.
+Для каждой страницы: уникальные title и description, canonical, Open Graph, хлебные крошки с микроразметкой, JSON-LD (TravelAgency, FAQPage, TouristTrip, Product, Service, ItemList). Корзина закрыта от индексации. Адреса карточек (`/excursions/<slug>.html`) сохранены.

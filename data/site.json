@@ -1,0 +1,16 @@
+{
+  "name": "Niko Phuket",
+  "url": "https://nikophuket.com",
+  "tagline": "Экскурсии и жизнь на Пхукете",
+  "currency": "THB",
+  "hours": "09:00–21:00",
+  "contacts": {
+    "telegram": "hitachi315",
+    "whatsapp": "",
+    "email": "hello@nikophuket.com"
+  },
+  "orders": {
+    "endpoint": ""
+  },
+  "analyticsId": "G-VRKTR3SHH0"
+}
