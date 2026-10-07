@@ -49,6 +49,7 @@
         width: min(1120px, calc(100% - 1.2rem));
         margin-inline: auto;
         max-width: 100%;
+        min-width: 0;
       }
       .seo-page {
         border-radius: var(--radius-lg);
@@ -58,12 +59,17 @@
         padding: clamp(1.2rem, 2.5vw, 2rem);
         width: 100%;
         max-width: 100%;
+        min-width: 0;
         box-sizing: border-box;
       }
-      .seo-head { margin-bottom: 0.9rem; }
+      .seo-head {
+        margin-bottom: 0.9rem;
+        min-width: 0;
+      }
       .seo-head h1 {
         margin: 0 0 0.6rem;
         max-width: 100%;
+        min-width: 0;
         overflow-wrap: anywhere;
         word-break: break-word;
       }
@@ -81,7 +87,14 @@
       }
       .seo-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 1.5rem; align-items: stretch; }
       .seo-grid .seo-card { display: flex; flex-direction: column; height: 100%; }
-      .seo-card { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1.2rem; background: var(--surface); margin-bottom: 1.5rem; }
+      .seo-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 1.2rem;
+        background: var(--surface);
+        margin-bottom: 1.5rem;
+        min-width: 0;
+      }
       @media (min-width: 1401px) {
         .seo-grid { grid-template-columns: repeat(3, 1fr); }
       }
@@ -123,12 +136,14 @@
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        min-width: 0;
       }
       .program-card {
         border: 1px solid var(--line);
         border-radius: var(--radius-md);
         padding: 1rem;
         background: var(--surface);
+        min-width: 0;
       }
       .program-card h3 {
         margin: 0 0 0.5rem;
@@ -200,6 +215,20 @@
         .seo-page {
           padding: 0.85rem;
         }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .field,
+        .field-wide,
+        .request-form,
+        .request {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+        .field-wide {
+          grid-column: auto;
+        }
         .seo-back-top .btn,
         .seo-request-wrap .btn,
         .seo-head-actions .btn {
@@ -234,7 +263,7 @@
         <a href="/rental/index.html">Аренда</a>
         <a href="/services/index.html">Услуги</a>
       </nav>
-      <a class="btn btn-ghost" href="/index.html#request">Оставить заявку</a>
+      <button class="header-booking btn btn-ghost" type="button" data-cart-open>Корзина <span data-cart-count>0</span></button>
     </header>
 
     <main class="seo-main">
@@ -253,7 +282,7 @@
     <section class="catalog">
       <div class="section-head">
         <h2>Морские экскурсии</h2>
-        <p>Всего маршрутов: 2</p>
+        <p>Всего маршрутов: 5</p>
       </div>
       <div class="seo-grid">
         <article class="tour-card">
@@ -278,6 +307,45 @@
         <p class="tour-card-price">Стоимость: от 2520 THB за человека</p>
         <div class="tour-card-actions">
           <a class="btn btn-small btn-primary" href="/excursions/james-bond-phang-nga.html#request">Забронировать</a>
+        </div>
+      </div>
+    </div>
+  </article>
+<article class="tour-card">
+    <img class="tour-card-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Пхи-Пхи: бухта Майя, снорклинг и острова Бамбу" loading="lazy" decoding="async" />
+    <div class="tour-card-body">
+      <h3 class="tour-card-title">Пхи-Пхи: бухта Майя, снорклинг и острова Бамбу</h3>
+      <p class="tour-card-overview">Бирюзовые бухты, белоснежный песок и та самая бухта из фильма «Пляж».</p>
+      <div class="tour-card-foot">
+        <p class="tour-card-price">Стоимость: от 1800 THB за человека</p>
+        <div class="tour-card-actions">
+          <a class="btn btn-small btn-primary" href="/excursions/phi-phi-maya-bay-snorkeling.html#request">Забронировать</a>
+        </div>
+      </div>
+    </div>
+  </article>
+<article class="tour-card">
+    <img class="tour-card-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Ранний Пхи-Пхи: рассвет в бухте Майя" loading="lazy" decoding="async" />
+    <div class="tour-card-body">
+      <h3 class="tour-card-title">Ранний Пхи-Пхи: рассвет в бухте Майя</h3>
+      <p class="tour-card-overview">Утренний маршрут до толп туристов: рассвет, Майя Бэй, Пиле, Викинговы пещеры и Бамбу.</p>
+      <div class="tour-card-foot">
+        <p class="tour-card-price">Стоимость: от 2300 THB за человека</p>
+        <div class="tour-card-actions">
+          <a class="btn btn-small btn-primary" href="/excursions/phi-phi-early-dawn-maya-bay.html#request">Забронировать</a>
+        </div>
+      </div>
+    </div>
+  </article>
+<article class="tour-card">
+    <img class="tour-card-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Симиланские острова" loading="lazy" decoding="async" />
+    <div class="tour-card-body">
+      <h3 class="tour-card-title">Симиланские острова</h3>
+      <p class="tour-card-overview">Одно из самых красивых мест Таиланда для снорклинга, дайвинга и белоснежных песчаных бухт.</p>
+      <div class="tour-card-foot">
+        <p class="tour-card-price">Стоимость: от 2700 THB за человека</p>
+        <div class="tour-card-actions">
+          <a class="btn btn-small btn-primary" href="/excursions/similan-islands.html#request">Забронировать</a>
         </div>
       </div>
     </div>
@@ -354,179 +422,6 @@
       </div>
     </footer>
 
-    <script>
-      (function () {
-        const form = document.querySelector('[data-enhanced-request="true"]');
-        if (!form) {
-          return;
-        }
-
-        const marketingStorageKey = 'niko-travel:marketing-context';
-
-        const submitButton = form.querySelector('button[type="submit"]');
-        const note = form.querySelector('[data-form-note]');
-        const travelDateField = form.querySelector('[name="travelDate"]');
-
-        if (travelDateField) {
-          travelDateField.min = new Date().toISOString().slice(0, 10);
-        }
-
-        const getStoredContext = () => {
-          try {
-            const raw = window.sessionStorage.getItem(marketingStorageKey);
-            return raw ? JSON.parse(raw) : {};
-          } catch {
-            return {};
-          }
-        };
-
-        const persistContext = () => {
-          const params = new URLSearchParams(window.location.search);
-          const existing = getStoredContext();
-          const context = {
-            landingPage: existing.landingPage || window.location.href,
-            lastPage: window.location.href,
-            referrer: existing.referrer || document.referrer || '',
-            utmSource: params.get('utm_source') || existing.utmSource || '',
-            utmMedium: params.get('utm_medium') || existing.utmMedium || '',
-            utmCampaign: params.get('utm_campaign') || existing.utmCampaign || '',
-            utmTerm: params.get('utm_term') || existing.utmTerm || '',
-            utmContent: params.get('utm_content') || existing.utmContent || '',
-            gclid: params.get('gclid') || existing.gclid || '',
-            fbclid: params.get('fbclid') || existing.fbclid || '',
-            yclid: params.get('yclid') || existing.yclid || '',
-            msclkid: params.get('msclkid') || existing.msclkid || ''
-          };
-
-          try {
-            window.sessionStorage.setItem(marketingStorageKey, JSON.stringify(context));
-          } catch {}
-
-          return context;
-        };
-
-        const assignHiddenField = (name, value) => {
-          const field = form.querySelector('[name="' + name + '"]');
-          if (field) {
-            field.value = value || '';
-          }
-        };
-
-        const trackEvent = (eventName, params) => {
-          if (typeof window.gtag === 'function') {
-            window.gtag('event', eventName, params);
-          }
-        };
-
-        const marketingContext = persistContext();
-        Object.entries(marketingContext).forEach(([key, value]) => {
-          assignHiddenField(key, value);
-        });
-
-        const setSubmitting = (isSubmitting) => {
-          if (!submitButton) {
-            return;
-          }
-          submitButton.disabled = isSubmitting;
-          submitButton.textContent = isSubmitting ? 'Отправляем...' : (form.dataset.itemType === 'excursion' ? 'Забронировать' : 'Отправить запрос');
-        };
-
-        const buildFallbackMessage = (formData) => {
-          const entries = [
-            'Здравствуйте! Хочу отправить запрос по услуге/товару.',
-            'Товар/услуга: ' + (formData.get('itemTitle') || ''),
-            formData.get('selectedProgram') ? 'Программа: ' + formData.get('selectedProgram') : '',
-            formData.get('travelDate') ? 'Дата экскурсии: ' + formData.get('travelDate') : '',
-            'Имя: ' + [formData.get('firstName') || '', formData.get('lastName') || ''].join(' ').trim(),
-            'Телефон: ' + (formData.get('phone') || ''),
-            'Отель: ' + (formData.get('hotel') || ''),
-            'Telegram: ' + (formData.get('telegramNick') || ''),
-            formData.get('adultsCount') ? 'Взрослые: ' + formData.get('adultsCount') : '',
-            formData.get('childrenCount') ? 'Дети: ' + formData.get('childrenCount') : '',
-            formData.get('rentalDuration') ? 'Желаемая длительность аренды: ' + formData.get('rentalDuration') : '',
-            formData.get('customerComment') ? 'Комментарий: ' + formData.get('customerComment') : ''
-          ];
-
-          return entries.filter(Boolean).join('
-');
-        };
-
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
-
-          if (travelDateField && travelDateField.value < new Date().toISOString().slice(0, 10)) {
-            if (note) {
-              note.textContent = 'Проверьте дату экскурсии: прошедшую дату бронировать нельзя.';
-            }
-            travelDateField.focus();
-            return;
-          }
-
-          const payload = new FormData(form);
-          setSubmitting(true);
-          if (note) {
-            note.textContent = 'Отправляем запрос...';
-          }
-
-          try {
-            const response = await fetch(form.action, {
-              method: 'POST',
-              headers: { Accept: 'application/json' },
-              body: payload
-            });
-
-            if (response.ok) {
-              form.reset();
-              Object.entries(marketingContext).forEach(([key, value]) => {
-                assignHiddenField(key, value);
-              });
-              if (note) {
-                note.textContent = 'Запрос отправлен. Менеджер свяжется с вами в ближайшее время.';
-              }
-              trackEvent('generate_lead', {
-                lead_type: form.dataset.itemType === 'excursion' ? 'excursion_booking' : 'rental_request',
-                send_method: 'email',
-                item_name: payload.get('itemTitle') || ''
-              });
-              return;
-            }
-
-            throw new Error('Email service rejected request');
-          } catch (error) {
-            const message = buildFallbackMessage(payload);
-            const telegramUrl = 'https://t.me/hitachi315';
-            window.open(telegramUrl, '_blank', 'noopener,noreferrer');
-
-            try {
-              if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(message);
-                if (note) {
-                  note.textContent = 'Открыт Telegram. Текст запроса скопирован, вставьте его в чат.';
-                }
-              } else if (note) {
-                note.textContent = 'Открыт Telegram. Вставьте детали запроса вручную.';
-              }
-            } catch {
-              if (note) {
-                note.textContent = 'Открыт Telegram. Вставьте детали запроса вручную.';
-              }
-            }
-
-            trackEvent('generate_lead', {
-              lead_type: form.dataset.itemType === 'excursion' ? 'excursion_booking' : 'rental_request',
-              send_method: 'telegram_fallback',
-              item_name: payload.get('itemTitle') || ''
-            });
-          } finally {
-            setSubmitting(false);
-          }
-        });
-      })();
-    </script>
+    <script type="module" src="/scripts/cart.js"></script>
   </body>
 </html>

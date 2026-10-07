@@ -7,7 +7,6 @@ const state = {
   quickCatalogCategory: "all",
   telegramUsername: "",
   currency: "USD",
-  emailService: null,
   isExcursionSubmitting: false
 };
 
@@ -85,7 +84,6 @@ async function initialize() {
   state.catalogItems = buildUnifiedCatalogItems();
   state.filtered = [...state.catalogItems];
   state.telegramUsername = normalizeTelegramUsername(excursionsData.telegram?.managerUsername);
-  state.emailService = normalizeEmailServiceConfig(excursionsData.emailService);
 
   setupManagerLink();
   renderUnifiedCards(getTopCatalogItems(state.catalogItems));
@@ -576,8 +574,7 @@ async function onFormSubmit(event) {
     return;
   }
 
-  const message = [
-    "Привет! Я хочу оставить заявку на подбор экскурсии, вот мои данные:",
+  const lines = [
     `Имя и фамилия: ${requestDetails.firstName} ${requestDetails.lastName}`,
     `Телефон: ${requestDetails.phone}`,
     `Отель: ${requestDetails.hotel}`,
@@ -585,65 +582,17 @@ async function onFormSubmit(event) {
     `Telegram: ${requestDetails.telegramNick}`,
     `Взрослые: ${requestDetails.adultsCount}`,
     `Дети: ${requestDetails.childrenCount}`,
-    `Даты отдыха: ${requestDetails.vacationStart} - ${requestDetails.vacationEnd}`,
-    ...buildMarketingMessageLines(marketingContext)
-  ].filter(Boolean).join("\n");
+    `Даты отдыха: ${requestDetails.vacationStart} - ${requestDetails.vacationEnd}`
+  ].filter(Boolean);
 
-  setExcursionSubmittingState(true);
-  showStatusDialog({
-    title: "Отправляем запрос...",
-    text: "Пожалуйста, подождите.",
-    mode: "loading"
+  // дальше окно выбора канала (бот / Telegram / WhatsApp) живёт в scripts/cart.js
+  window.NikoCart.openSelection({
+    lines,
+    onSent: () => {
+      refs.form.reset();
+      refs.formNote.textContent = "Заявка на подбор отправлена. Мы свяжемся с вами в ближайшее время.";
+    }
   });
-
-  try {
-    if (state.emailService?.endpoint) {
-      const result = await sendRequestViaEmailService(requestDetails, message);
-
-      if (result.ok) {
-        refs.formNote.textContent = "Заявка на подбор отправлена. Мы свяжемся с вами в ближайшее время.";
-        refs.form.reset();
-        trackAnalyticsEvent("generate_lead", {
-          lead_type: "selection_request",
-          send_method: "email",
-          form_location: "homepage"
-        });
-        showStatusDialog({
-          title: "Мы приняли вашу заявку на подбор",
-          text: "Менеджер свяжется с вами в ближайшее время.",
-          mode: "success"
-        });
-        return;
-      }
-
-      refs.formNote.textContent = result.error || "Не удалось отправить заявку на email. Открываем Telegram как резервный канал.";
-    }
-
-    const telegramUrl = buildTelegramRequestUrl();
-    window.open(telegramUrl, "_blank", "noopener,noreferrer");
-
-    if (state.telegramUsername) {
-      const copied = await copyToClipboard(message);
-      refs.formNote.textContent = copied
-        ? `Открыт чат @${state.telegramUsername}. Текст заявки скопирован, вставьте его в диалог.`
-        : `Открыт чат @${state.telegramUsername}. Скопируйте текст заявки вручную и отправьте менеджеру.`;
-    } else {
-      refs.formNote.textContent = "Открываем Telegram с готовым текстом заявки...";
-    }
-
-    showStatusDialog({
-      title: "Нужна отправка через Telegram",
-      text: "Мы открыли резервный канал. Завершите отправку заявки в Telegram.",
-      mode: "fallback"
-    });
-    trackAnalyticsEvent("generate_lead", {
-      lead_type: "selection_request",
-      send_method: "telegram_fallback",
-      form_location: "homepage"
-    });
-  } finally {
-    setExcursionSubmittingState(false);
-  }
 }
 
 function setExcursionSubmittingState(isSubmitting) {
@@ -675,119 +624,6 @@ function closeStatusDialog() {
   }
 }
 
-async function sendRequestViaEmailService(requestDetails, message) {
-  try {
-    const payload = new FormData();
-    payload.append("_subject", "Новая заявка на подбор экскурсии");
-    payload.append("name", `${requestDetails.firstName} ${requestDetails.lastName}`);
-    payload.append("phone", requestDetails.phone);
-    payload.append("hotel", requestDetails.hotel);
-    payload.append("preferences", requestDetails.preferences || "");
-    payload.append("telegramNick", requestDetails.telegramNick);
-    payload.append("adultsCount", String(requestDetails.adultsCount));
-    payload.append("childrenCount", String(requestDetails.childrenCount));
-    payload.append("vacationStart", requestDetails.vacationStart);
-    payload.append("vacationEnd", requestDetails.vacationEnd);
-    payload.append("leadType", "Заявка на подбор экскурсии");
-    payload.append("source", "Niko Travel selection request form");
-    payload.append("submittedAt", new Date().toISOString());
-    appendMarketingFields(payload, marketingContext);
-    payload.append("message", message);
-
-    const response = await fetch(state.emailService.endpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/json"
-      },
-      body: payload
-    });
-
-    const responseData = await response.json().catch(() => null);
-
-    if (response.ok) {
-      return { ok: true, error: "" };
-    }
-
-    const apiError = extractEmailServiceError(responseData);
-    console.error("Email service error", response.status, responseData);
-    return { ok: false, error: apiError || "Сервис email отклонил заявку." };
-  } catch (error) {
-    console.error("Email service unavailable", error);
-    return { ok: false, error: "Сервис email временно недоступен." };
-  }
-}
-
-async function sendRentalRequestViaEmailService(requestDetails, message) {
-  try {
-    const payload = new FormData();
-    payload.append("_subject", "Новая заявка на аренду");
-    payload.append("name", `${requestDetails.firstName} ${requestDetails.lastName}`);
-    payload.append("phone", requestDetails.phone);
-    payload.append("hotel", requestDetails.hotel);
-    payload.append("telegramNick", requestDetails.telegramNick);
-    payload.append("rentalDuration", requestDetails.rentalDuration);
-    payload.append("leadType", "Заявка на аренду");
-    payload.append("source", "Niko Travel rental request form");
-    payload.append("submittedAt", new Date().toISOString());
-    appendMarketingFields(payload, marketingContext);
-    payload.append("message", message);
-
-    const response = await fetch(state.emailService.endpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/json"
-      },
-      body: payload
-    });
-
-    const responseData = await response.json().catch(() => null);
-
-    if (response.ok) {
-      return { ok: true, error: "" };
-    }
-
-    const apiError = extractEmailServiceError(responseData);
-    console.error("Email service error", response.status, responseData);
-    return { ok: false, error: apiError || "Сервис email отклонил заявку." };
-  } catch (error) {
-    console.error("Email service unavailable", error);
-    return { ok: false, error: "Сервис email временно недоступен." };
-  }
-}
-
-function extractEmailServiceError(responseData) {
-  if (!responseData || typeof responseData !== "object") {
-    return "";
-  }
-
-  if (Array.isArray(responseData.errors) && responseData.errors.length) {
-    return responseData.errors.map((item) => item.message).filter(Boolean).join(" ");
-  }
-
-  return typeof responseData.error === "string" ? responseData.error : "";
-}
-
-function normalizeEmailServiceConfig(config) {
-  if (!config || typeof config !== "object") {
-    return null;
-  }
-
-  const endpoint = String(config.endpoint || "").trim();
-  if (!endpoint) {
-    return null;
-  }
-
-  return { endpoint };
-}
-
-function buildTelegramRequestUrl() {
-  if (state.telegramUsername) {
-    return `https://t.me/${state.telegramUsername}`;
-  }
-
-  return "https://t.me/share/url";
-}
-
 function normalizeTelegramUsername(value) {
   if (!value) {
     return "";
@@ -800,19 +636,6 @@ function normalizeTelegramUsername(value) {
   normalized = normalized.split(/[/?#]/)[0];
 
   return normalized;
-}
-
-async function copyToClipboard(text) {
-  if (!navigator.clipboard || !window.isSecureContext) {
-    return false;
-  }
-
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function getExcursionById(excursionId) {
@@ -1021,39 +844,6 @@ function readStoredMarketingContext() {
   } catch {
     return {};
   }
-}
-
-function appendMarketingFields(payload, context) {
-  const fields = {
-    landingPage: context.landingPage,
-    lastPage: context.lastPage,
-    referrer: context.referrer,
-    utmSource: context.utmSource,
-    utmMedium: context.utmMedium,
-    utmCampaign: context.utmCampaign,
-    utmTerm: context.utmTerm,
-    utmContent: context.utmContent,
-    gclid: context.gclid,
-    fbclid: context.fbclid,
-    yclid: context.yclid,
-    msclkid: context.msclkid
-  };
-
-  Object.entries(fields).forEach(([key, value]) => {
-    if (value) {
-      payload.append(key, value);
-    }
-  });
-}
-
-function buildMarketingMessageLines(context) {
-  return [
-    context.utmSource ? `UTM source: ${context.utmSource}` : "",
-    context.utmMedium ? `UTM medium: ${context.utmMedium}` : "",
-    context.utmCampaign ? `UTM campaign: ${context.utmCampaign}` : "",
-    context.gclid ? `GCLID: ${context.gclid}` : "",
-    context.referrer ? `Referrer: ${context.referrer}` : ""
-  ].filter(Boolean);
 }
 
 function trackAnalyticsEvent(eventName, params = {}) {

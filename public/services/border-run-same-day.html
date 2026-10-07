@@ -46,6 +46,10 @@
         display: grid;
         gap: 1.8rem;
         padding-bottom: 2.8rem;
+        width: min(1120px, calc(100% - 1.2rem));
+        margin-inline: auto;
+        max-width: 100%;
+        min-width: 0;
       }
       .seo-page {
         border-radius: var(--radius-lg);
@@ -53,13 +57,27 @@
         background: rgba(255, 254, 248, 0.9);
         box-shadow: var(--shadow);
         padding: clamp(1.2rem, 2.5vw, 2rem);
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
       }
-      .seo-head { margin-bottom: 0.9rem; }
-      .seo-head h1 { margin: 0 0 0.6rem; }
+      .seo-head {
+        margin-bottom: 0.9rem;
+        min-width: 0;
+      }
+      .seo-head h1 {
+        margin: 0 0 0.6rem;
+        max-width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
       .seo-head p {
         color: var(--muted);
         max-width: 760px;
         line-height: 1.5;
+        overflow-wrap: anywhere;
       }
       .seo-head-actions {
         margin-top: 0.9rem;
@@ -69,7 +87,14 @@
       }
       .seo-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 1.5rem; align-items: stretch; }
       .seo-grid .seo-card { display: flex; flex-direction: column; height: 100%; }
-      .seo-card { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1.2rem; background: var(--surface); margin-bottom: 1.5rem; }
+      .seo-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 1.2rem;
+        background: var(--surface);
+        margin-bottom: 1.5rem;
+        min-width: 0;
+      }
       @media (min-width: 1401px) {
         .seo-grid { grid-template-columns: repeat(3, 1fr); }
       }
@@ -93,7 +118,14 @@
       .itinerary-step { display: flex; gap: 0.8rem; padding: 0.6rem; background: var(--bg); border-radius: var(--radius-sm); align-items: flex-start; }
       .itinerary-time { min-width: 60px; font-weight: 600; color: var(--brand); font-size: 0.9rem; }
       .itinerary-activity { flex: 1; font-size: 0.9rem; }
-      .seo-breadcrumbs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+      .seo-breadcrumbs {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
       .seo-breadcrumbs a { color: var(--brand); }
       .seo-back-top { margin-bottom: 0.9rem; }
       .muted { opacity: 0.85; }
@@ -104,12 +136,14 @@
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        min-width: 0;
       }
       .program-card {
         border: 1px solid var(--line);
         border-radius: var(--radius-md);
         padding: 1rem;
         background: var(--surface);
+        min-width: 0;
       }
       .program-card h3 {
         margin: 0 0 0.5rem;
@@ -175,8 +209,25 @@
         }
       }
       @media (max-width: 430px) {
+        .seo-main {
+          width: min(1120px, calc(100% - 0.9rem));
+        }
         .seo-page {
           padding: 0.85rem;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .field,
+        .field-wide,
+        .request-form,
+        .request {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+        .field-wide {
+          grid-column: auto;
         }
         .seo-back-top .btn,
         .seo-request-wrap .btn,
@@ -212,7 +263,7 @@
         <a href="/rental/index.html">Аренда</a>
         <a href="/services/index.html">Услуги</a>
       </nav>
-      <a class="btn btn-ghost" href="/index.html#request">Оставить заявку</a>
+      <button class="header-booking btn btn-ghost" type="button" data-cart-open>Корзина <span data-cart-count>0</span></button>
     </header>
 
     <main class="seo-main">
@@ -251,6 +302,25 @@
         <h2>📌 Важно знать</h2>
         <p>Требуется загранпаспорт и оригинал TM.30. Граждане РФ нужна дополнительная справка. Всё оформляется за 3-5 дней до выезда. Возврат 50% если отмена за 24 часа.</p>
       </section>
+    <div class="seo-request-wrap"><section class="request" id="request">
+      <div class="section-head">
+        <h2>Заказ услуги</h2>
+        <p>Добавьте позицию в корзину. Можно собрать несколько и отправить одной заявкой: телефон и отель для трансфера вы укажете при оформлении.</p>
+      </div>
+      <form class="request-form" data-cart-form data-item-type="service" data-item-id="border-run-same-day" data-item-title="Border Run на 1 день" data-item-url="/services/border-run-same-day.html" data-item-price="4200 THB за человека">
+        <div class="form-grid">
+          
+          <label class="field field-wide"><span>Дата</span><input name="travelDate" type="date" required /></label>
+      <label class="field"><span>Количество взрослых</span><input name="adultsCount" type="number" min="1" value="2" required /></label>
+      <label class="field"><span>Количество детей</span><input name="childrenCount" type="number" min="0" value="0" required /></label>
+      <label class="field field-wide"><span>Комментарий (возраст детей, детали)</span><textarea name="customerComment" rows="3" placeholder="Например: рейс SU275, прилёт в 14:20"></textarea></label>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Добавить в корзину</button>
+          <button class="btn btn-ghost" type="button" data-cart-open>Перейти в корзину</button>
+        </div>
+      </form>
+    </section></div>
       </section>
     </main>
 
@@ -300,179 +370,6 @@
       </div>
     </footer>
 
-    <script>
-      (function () {
-        const form = document.querySelector('[data-enhanced-request="true"]');
-        if (!form) {
-          return;
-        }
-
-        const marketingStorageKey = 'niko-travel:marketing-context';
-
-        const submitButton = form.querySelector('button[type="submit"]');
-        const note = form.querySelector('[data-form-note]');
-        const travelDateField = form.querySelector('[name="travelDate"]');
-
-        if (travelDateField) {
-          travelDateField.min = new Date().toISOString().slice(0, 10);
-        }
-
-        const getStoredContext = () => {
-          try {
-            const raw = window.sessionStorage.getItem(marketingStorageKey);
-            return raw ? JSON.parse(raw) : {};
-          } catch {
-            return {};
-          }
-        };
-
-        const persistContext = () => {
-          const params = new URLSearchParams(window.location.search);
-          const existing = getStoredContext();
-          const context = {
-            landingPage: existing.landingPage || window.location.href,
-            lastPage: window.location.href,
-            referrer: existing.referrer || document.referrer || '',
-            utmSource: params.get('utm_source') || existing.utmSource || '',
-            utmMedium: params.get('utm_medium') || existing.utmMedium || '',
-            utmCampaign: params.get('utm_campaign') || existing.utmCampaign || '',
-            utmTerm: params.get('utm_term') || existing.utmTerm || '',
-            utmContent: params.get('utm_content') || existing.utmContent || '',
-            gclid: params.get('gclid') || existing.gclid || '',
-            fbclid: params.get('fbclid') || existing.fbclid || '',
-            yclid: params.get('yclid') || existing.yclid || '',
-            msclkid: params.get('msclkid') || existing.msclkid || ''
-          };
-
-          try {
-            window.sessionStorage.setItem(marketingStorageKey, JSON.stringify(context));
-          } catch {}
-
-          return context;
-        };
-
-        const assignHiddenField = (name, value) => {
-          const field = form.querySelector('[name="' + name + '"]');
-          if (field) {
-            field.value = value || '';
-          }
-        };
-
-        const trackEvent = (eventName, params) => {
-          if (typeof window.gtag === 'function') {
-            window.gtag('event', eventName, params);
-          }
-        };
-
-        const marketingContext = persistContext();
-        Object.entries(marketingContext).forEach(([key, value]) => {
-          assignHiddenField(key, value);
-        });
-
-        const setSubmitting = (isSubmitting) => {
-          if (!submitButton) {
-            return;
-          }
-          submitButton.disabled = isSubmitting;
-          submitButton.textContent = isSubmitting ? 'Отправляем...' : (form.dataset.itemType === 'excursion' ? 'Забронировать' : 'Отправить запрос');
-        };
-
-        const buildFallbackMessage = (formData) => {
-          const entries = [
-            'Здравствуйте! Хочу отправить запрос по услуге/товару.',
-            'Товар/услуга: ' + (formData.get('itemTitle') || ''),
-            formData.get('selectedProgram') ? 'Программа: ' + formData.get('selectedProgram') : '',
-            formData.get('travelDate') ? 'Дата экскурсии: ' + formData.get('travelDate') : '',
-            'Имя: ' + [formData.get('firstName') || '', formData.get('lastName') || ''].join(' ').trim(),
-            'Телефон: ' + (formData.get('phone') || ''),
-            'Отель: ' + (formData.get('hotel') || ''),
-            'Telegram: ' + (formData.get('telegramNick') || ''),
-            formData.get('adultsCount') ? 'Взрослые: ' + formData.get('adultsCount') : '',
-            formData.get('childrenCount') ? 'Дети: ' + formData.get('childrenCount') : '',
-            formData.get('rentalDuration') ? 'Желаемая длительность аренды: ' + formData.get('rentalDuration') : '',
-            formData.get('customerComment') ? 'Комментарий: ' + formData.get('customerComment') : ''
-          ];
-
-          return entries.filter(Boolean).join('
-');
-        };
-
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
-
-          if (travelDateField && travelDateField.value < new Date().toISOString().slice(0, 10)) {
-            if (note) {
-              note.textContent = 'Проверьте дату экскурсии: прошедшую дату бронировать нельзя.';
-            }
-            travelDateField.focus();
-            return;
-          }
-
-          const payload = new FormData(form);
-          setSubmitting(true);
-          if (note) {
-            note.textContent = 'Отправляем запрос...';
-          }
-
-          try {
-            const response = await fetch(form.action, {
-              method: 'POST',
-              headers: { Accept: 'application/json' },
-              body: payload
-            });
-
-            if (response.ok) {
-              form.reset();
-              Object.entries(marketingContext).forEach(([key, value]) => {
-                assignHiddenField(key, value);
-              });
-              if (note) {
-                note.textContent = 'Запрос отправлен. Менеджер свяжется с вами в ближайшее время.';
-              }
-              trackEvent('generate_lead', {
-                lead_type: form.dataset.itemType === 'excursion' ? 'excursion_booking' : 'rental_request',
-                send_method: 'email',
-                item_name: payload.get('itemTitle') || ''
-              });
-              return;
-            }
-
-            throw new Error('Email service rejected request');
-          } catch (error) {
-            const message = buildFallbackMessage(payload);
-            const telegramUrl = 'https://t.me/hitachi315';
-            window.open(telegramUrl, '_blank', 'noopener,noreferrer');
-
-            try {
-              if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(message);
-                if (note) {
-                  note.textContent = 'Открыт Telegram. Текст запроса скопирован, вставьте его в чат.';
-                }
-              } else if (note) {
-                note.textContent = 'Открыт Telegram. Вставьте детали запроса вручную.';
-              }
-            } catch {
-              if (note) {
-                note.textContent = 'Открыт Telegram. Вставьте детали запроса вручную.';
-              }
-            }
-
-            trackEvent('generate_lead', {
-              lead_type: form.dataset.itemType === 'excursion' ? 'excursion_booking' : 'rental_request',
-              send_method: 'telegram_fallback',
-              item_name: payload.get('itemTitle') || ''
-            });
-          } finally {
-            setSubmitting(false);
-          }
-        });
-      })();
-    </script>
+    <script type="module" src="/scripts/cart.js"></script>
   </body>
 </html>

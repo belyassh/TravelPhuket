@@ -6,8 +6,9 @@
   "telegram": {
     "managerUsername": "hitachi315"
   },
-  "emailService": {
-    "endpoint": "https://formspree.io/f/meerbjwa"
+  "orders": {
+    "endpoint": "",
+    "whatsappNumber": ""
   },
   "excursions": [
     {

@@ -7,9 +7,9 @@ const DATA_DIR = path.join(ROOT, "data");
 const STYLES_SRC = path.join(ROOT, "styles", "main.css");
 const IMAGE_SRC = path.join(ROOT, "image.png");
 const FAVICON_SRC = path.join(ROOT, "niko_phuket_favicon.ico");
+const CART_SRC = path.join(ROOT, "scripts", "cart.js");
 const SITE_URL = "https://nikophuket.com";
 const FALLBACK_CARD_IMAGE = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80";
-const TELEGRAM_MANAGER_USERNAME = "hitachi315";
 const GA_MEASUREMENT_ID = "G-VRKTR3SHH0";
 
 const CATEGORY_LABELS = {
@@ -49,6 +49,7 @@ function syncSharedAssets() {
   copyFileIfExists(STYLES_SRC, path.join(PUBLIC_DIR, "styles", "main.css"));
   copyFileIfExists(IMAGE_SRC, path.join(PUBLIC_DIR, "image.png"));
   copyFileIfExists(FAVICON_SRC, path.join(PUBLIC_DIR, "niko_phuket_favicon.ico"));
+  copyFileIfExists(CART_SRC, path.join(PUBLIC_DIR, "scripts", "cart.js"));
 }
 
 function writeGeneratedPage(relativePath, content) {
@@ -375,7 +376,7 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
         <a href="/rental/index.html">Аренда</a>
         <a href="/services/index.html">Услуги</a>
       </nav>
-      <a class="btn btn-ghost" href="/index.html#request">Оставить заявку</a>
+      <button class="header-booking btn btn-ghost" type="button" data-cart-open>Корзина <span data-cart-count>0</span></button>
     </header>
 
     <main class="seo-main">
@@ -431,179 +432,7 @@ function pageTemplate({ title, description, canonicalPath, body, jsonLd }) {
       </div>
     </footer>
 
-    <script>
-      (function () {
-        const form = document.querySelector('[data-enhanced-request="true"]');
-        if (!form) {
-          return;
-        }
-
-        const marketingStorageKey = 'niko-travel:marketing-context';
-
-        const submitButton = form.querySelector('button[type="submit"]');
-        const note = form.querySelector('[data-form-note]');
-        const travelDateField = form.querySelector('[name="travelDate"]');
-
-        if (travelDateField) {
-          travelDateField.min = new Date().toISOString().slice(0, 10);
-        }
-
-        const getStoredContext = () => {
-          try {
-            const raw = window.sessionStorage.getItem(marketingStorageKey);
-            return raw ? JSON.parse(raw) : {};
-          } catch {
-            return {};
-          }
-        };
-
-        const persistContext = () => {
-          const params = new URLSearchParams(window.location.search);
-          const existing = getStoredContext();
-          const context = {
-            landingPage: existing.landingPage || window.location.href,
-            lastPage: window.location.href,
-            referrer: existing.referrer || document.referrer || '',
-            utmSource: params.get('utm_source') || existing.utmSource || '',
-            utmMedium: params.get('utm_medium') || existing.utmMedium || '',
-            utmCampaign: params.get('utm_campaign') || existing.utmCampaign || '',
-            utmTerm: params.get('utm_term') || existing.utmTerm || '',
-            utmContent: params.get('utm_content') || existing.utmContent || '',
-            gclid: params.get('gclid') || existing.gclid || '',
-            fbclid: params.get('fbclid') || existing.fbclid || '',
-            yclid: params.get('yclid') || existing.yclid || '',
-            msclkid: params.get('msclkid') || existing.msclkid || ''
-          };
-
-          try {
-            window.sessionStorage.setItem(marketingStorageKey, JSON.stringify(context));
-          } catch {}
-
-          return context;
-        };
-
-        const assignHiddenField = (name, value) => {
-          const field = form.querySelector('[name="' + name + '"]');
-          if (field) {
-            field.value = value || '';
-          }
-        };
-
-        const trackEvent = (eventName, params) => {
-          if (typeof window.gtag === 'function') {
-            window.gtag('event', eventName, params);
-          }
-        };
-
-        const marketingContext = persistContext();
-        Object.entries(marketingContext).forEach(([key, value]) => {
-          assignHiddenField(key, value);
-        });
-
-        const setSubmitting = (isSubmitting) => {
-          if (!submitButton) {
-            return;
-          }
-          submitButton.disabled = isSubmitting;
-          submitButton.textContent = isSubmitting ? 'Отправляем...' : (form.dataset.itemType === 'excursion' ? 'Забронировать' : 'Отправить запрос');
-        };
-
-        const buildFallbackMessage = (formData) => {
-          const entries = [
-            'Здравствуйте! Хочу отправить запрос по услуге/товару.',
-            'Товар/услуга: ' + (formData.get('itemTitle') || ''),
-            formData.get('selectedProgram') ? 'Программа: ' + formData.get('selectedProgram') : '',
-            formData.get('travelDate') ? 'Дата экскурсии: ' + formData.get('travelDate') : '',
-            'Имя: ' + [formData.get('firstName') || '', formData.get('lastName') || ''].join(' ').trim(),
-            'Телефон: ' + (formData.get('phone') || ''),
-            'Отель: ' + (formData.get('hotel') || ''),
-            'Telegram: ' + (formData.get('telegramNick') || ''),
-            formData.get('adultsCount') ? 'Взрослые: ' + formData.get('adultsCount') : '',
-            formData.get('childrenCount') ? 'Дети: ' + formData.get('childrenCount') : '',
-            formData.get('rentalDuration') ? 'Желаемая длительность аренды: ' + formData.get('rentalDuration') : '',
-            formData.get('customerComment') ? 'Комментарий: ' + formData.get('customerComment') : ''
-          ];
-
-          return entries.filter(Boolean).join('\n');
-        };
-
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
-
-          if (travelDateField && travelDateField.value < new Date().toISOString().slice(0, 10)) {
-            if (note) {
-              note.textContent = 'Проверьте дату экскурсии: прошедшую дату бронировать нельзя.';
-            }
-            travelDateField.focus();
-            return;
-          }
-
-          const payload = new FormData(form);
-          setSubmitting(true);
-          if (note) {
-            note.textContent = 'Отправляем запрос...';
-          }
-
-          try {
-            const response = await fetch(form.action, {
-              method: 'POST',
-              headers: { Accept: 'application/json' },
-              body: payload
-            });
-
-            if (response.ok) {
-              form.reset();
-              Object.entries(marketingContext).forEach(([key, value]) => {
-                assignHiddenField(key, value);
-              });
-              if (note) {
-                note.textContent = 'Запрос отправлен. Менеджер свяжется с вами в ближайшее время.';
-              }
-              trackEvent('generate_lead', {
-                lead_type: form.dataset.itemType === 'excursion' ? 'excursion_booking' : 'rental_request',
-                send_method: 'email',
-                item_name: payload.get('itemTitle') || ''
-              });
-              return;
-            }
-
-            throw new Error('Email service rejected request');
-          } catch (error) {
-            const message = buildFallbackMessage(payload);
-            const telegramUrl = 'https://t.me/${TELEGRAM_MANAGER_USERNAME}';
-            window.open(telegramUrl, '_blank', 'noopener,noreferrer');
-
-            try {
-              if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(message);
-                if (note) {
-                  note.textContent = 'Открыт Telegram. Текст запроса скопирован, вставьте его в чат.';
-                }
-              } else if (note) {
-                note.textContent = 'Открыт Telegram. Вставьте детали запроса вручную.';
-              }
-            } catch {
-              if (note) {
-                note.textContent = 'Открыт Telegram. Вставьте детали запроса вручную.';
-              }
-            }
-
-            trackEvent('generate_lead', {
-              lead_type: form.dataset.itemType === 'excursion' ? 'excursion_booking' : 'rental_request',
-              send_method: 'telegram_fallback',
-              item_name: payload.get('itemTitle') || ''
-            });
-          } finally {
-            setSubmitting(false);
-          }
-        });
-      })();
-    </script>
+    <script type="module" src="/scripts/cart.js"></script>
   </body>
 </html>`;
 }
@@ -669,78 +498,51 @@ function renderProgramSelect(programs) {
   }
 
   return `<label class="field field-wide"><span>Программа / отправление</span><select name="selectedProgram" required>
-    ${programs.map((program, index) => `<option value="${escapeHtml(program.title)}|${escapeHtml(program.departure || "")}|${escapeHtml(program.priceLabel || "")}"${index === 0 ? " selected" : ""}>${escapeHtml(program.title)}${program.departure ? ` • ${escapeHtml(program.departure)}` : ""}${program.priceLabel ? ` • ${escapeHtml(program.priceLabel)}` : ""}</option>`).join("")}
+    ${programs.map((program, index) => `<option value="${escapeHtml(program.title)}" data-departure="${escapeHtml(program.departure || "")}" data-price="${escapeHtml(program.priceLabel || "")}"${index === 0 ? " selected" : ""}>${escapeHtml(program.title)}${program.departure ? ` • ${escapeHtml(program.departure)}` : ""}${program.priceLabel ? ` • ${escapeHtml(program.priceLabel)}` : ""}</option>`).join("")}
   </select></label>`;
 }
 
-function requestFields(type) {
-  const durationField = type === "rental"
-    ? `<label class="field field-wide"><span>Желаемая длительность аренды</span><input name="rentalDuration" type="text" placeholder="Например: 5 дней" required /></label>`
-    : `<label class="field"><span>Количество взрослых</span><input name="adultsCount" type="number" min="1" value="2" required /></label>
-       <label class="field"><span>Количество детей</span><input name="childrenCount" type="number" min="0" value="0" required /></label>
-       <label class="field field-wide"><span>Дата экскурсии</span><input name="travelDate" type="date" required /></label>
-       <label class="field field-wide"><span>Комментарий</span><textarea name="customerComment" rows="3" placeholder="Например: нужен трансфер из Бангтао, двое детей 6 и 9 лет"></textarea></label>`;
-
-  return `<label class="field"><span>Имя</span><input name="firstName" type="text" required /></label>
-      <label class="field"><span>Фамилия</span><input name="lastName" type="text" required /></label>
-      <label class="field field-wide"><span>Телефон</span><input name="phone" type="tel" placeholder="+7..." required /></label>
-      <label class="field"><span>Отель</span><input name="hotel" type="text" placeholder="Название отеля" required /></label>
-      <label class="field"><span>Ник в Telegram</span><input name="telegramNick" type="text" placeholder="@nickname" required /></label>
-      ${durationField}`;
-}
-
-function renderProductRequestForm({ type, itemTitle, endpoint, programs = [] }) {
-  const subject = type === "rental"
-    ? `Новый запрос по аренде: ${itemTitle}`
-    : `Новая бронь экскурсии: ${itemTitle}`;
-  const leadType = type === "rental" ? "Запрос по аренде" : "Бронь экскурсии";
-  const source = type === "rental" ? "Niko Phuket rental product page" : "Niko Phuket excursion product page";
-
-  if (!endpoint) {
-    return `<div class="seo-request-wrap"><section class="request" id="request">
-      <div class="section-head">
-        <h2>${type === "rental" ? "Запрос по аренде" : "Бронирование экскурсии"}</h2>
-        <p>Для отправки запроса напишите менеджеру в Telegram через кнопку в шапке или на главной странице.</p>
-      </div>
-      </section></div>`;
+function cartFields(type) {
+  if (type === "rental") {
+    return `<label class="field"><span>Дата начала аренды</span><input name="travelDate" type="date" required /></label>
+      <label class="field"><span>Срок аренды</span><input name="rentalDuration" type="text" placeholder="Например: 5 дней" required /></label>
+      <label class="field field-wide"><span>Комментарий</span><textarea name="customerComment" rows="3" placeholder="Например: нужен детский шлем, доставка в отель"></textarea></label>`;
   }
 
-    return `<div class="seo-request-wrap"><section class="request" id="request">
+  const dateLabel = type === "excursion" ? "Дата экскурсии" : "Дата";
+  const commentHint = type === "excursion"
+    ? "Например: двое детей, 6 и 9 лет"
+    : "Например: рейс SU275, прилёт в 14:20";
+
+  return `<label class="field field-wide"><span>${dateLabel}</span><input name="travelDate" type="date" required /></label>
+      <label class="field"><span>Количество взрослых</span><input name="adultsCount" type="number" min="1" value="2" required /></label>
+      <label class="field"><span>Количество детей</span><input name="childrenCount" type="number" min="0" value="0" required /></label>
+      <label class="field field-wide"><span>Комментарий (возраст детей, детали)</span><textarea name="customerComment" rows="3" placeholder="${commentHint}"></textarea></label>`;
+}
+
+function renderCartForm({ type, item, urlPath }) {
+  const programs = type === "excursion" ? (item.programs || []) : [];
+  const headings = { excursion: "Бронирование экскурсии", rental: "Запрос по аренде", service: "Заказ услуги" };
+
+  return `<div class="seo-request-wrap"><section class="request" id="request">
       <div class="section-head">
-        <h2>${type === "rental" ? "Запрос по аренде" : "Бронирование экскурсии"}</h2>
-        <p>${type === "rental" ? "Заполните форму: менеджер свяжется с вами для подтверждения деталей." : "Выберите программу, дату и отправьте бронирование. Менеджер подтвердит наличие мест и детали трансфера."}</p>
+        <h2>${headings[type]}</h2>
+        <p>Добавьте позицию в корзину. Можно собрать несколько и отправить одной заявкой: телефон и отель для трансфера вы укажете при оформлении.</p>
       </div>
-      <form class="request-form" method="POST" action="${endpoint}" data-enhanced-request="true" data-item-type="${escapeHtml(type)}">
-        <input type="hidden" name="_subject" value="${escapeHtml(subject)}" />
-        <input type="hidden" name="leadType" value="${escapeHtml(leadType)}" />
-        <input type="hidden" name="itemTitle" value="${escapeHtml(itemTitle)}" />
-        <input type="hidden" name="source" value="${escapeHtml(source)}" />
-        <input type="hidden" name="landingPage" value="" />
-        <input type="hidden" name="lastPage" value="" />
-        <input type="hidden" name="referrer" value="" />
-        <input type="hidden" name="utmSource" value="" />
-        <input type="hidden" name="utmMedium" value="" />
-        <input type="hidden" name="utmCampaign" value="" />
-        <input type="hidden" name="utmTerm" value="" />
-        <input type="hidden" name="utmContent" value="" />
-        <input type="hidden" name="gclid" value="" />
-        <input type="hidden" name="fbclid" value="" />
-        <input type="hidden" name="yclid" value="" />
-        <input type="hidden" name="msclkid" value="" />
+      <form class="request-form" data-cart-form data-item-type="${type}" data-item-id="${escapeHtml(item.id)}" data-item-title="${escapeHtml(item.title)}" data-item-url="${escapeHtml(urlPath)}" data-item-price="${escapeHtml(item.priceLabel || "")}">
         <div class="form-grid">
-          ${type === "excursion" ? renderProgramSelect(programs) : ""}
-          ${requestFields(type)}
-          <input name="_gotcha" type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none;" aria-hidden="true" />
+          ${renderProgramSelect(programs)}
+          ${cartFields(type)}
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary" type="submit">${type === "rental" ? "Отправить запрос" : "Забронировать"}</button>
-          <p class="form-note" data-form-note aria-live="polite"></p>
+          <button class="btn btn-primary" type="submit">Добавить в корзину</button>
+          <button class="btn btn-ghost" type="button" data-cart-open>Перейти в корзину</button>
         </div>
       </form>
     </section></div>`;
 }
 
-function excursionDetailPage(item, endpoint) {
+function excursionDetailPage(item) {
   const urlPath = `/excursions/${item.slug}.html`;
   const title = `${item.title} | Экскурсия на Пхукете | Niko Phuket`;
   const description = item.overview || item.description || `Экскурсия ${item.title} на Пхукете`;
@@ -841,7 +643,7 @@ function excursionDetailPage(item, endpoint) {
     </section>
     ${requirementsHtml}
     ${notesHtml}
-    ${renderProductRequestForm({ type: "excursion", itemTitle: item.title, endpoint, programs: item.programs || [] })}`;
+    ${renderCartForm({ type: "excursion", item, urlPath })}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -874,7 +676,7 @@ function excursionDetailPage(item, endpoint) {
   return { path: urlPath, html: pageTemplate({ title, description, canonicalPath: urlPath, body, jsonLd }) };
 }
 
-function rentalDetailPage(item, endpoint) {
+function rentalDetailPage(item) {
   const urlPath = `/rental/${item.slug}.html`;
   const title = `${item.title} | Аренда на Пхукете | Niko Phuket`;
   const description = item.overview || item.description || `Аренда ${item.title} на Пхукете`;
@@ -941,7 +743,7 @@ function rentalDetailPage(item, endpoint) {
     </section>
     ${requirementsHtml}
     ${notesHtml}
-    ${renderProductRequestForm({ type: "rental", itemTitle: item.title, endpoint })}`;
+    ${renderCartForm({ type: "rental", item, urlPath })}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -1019,7 +821,8 @@ function serviceDetailPage(item) {
       <p>${escapeHtml(item.description || "")}</p>
     </section>
     ${includedHtml}
-    ${notesHtml}`;
+    ${notesHtml}
+    ${renderCartForm({ type: "service", item, urlPath })}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -1189,7 +992,6 @@ function main() {
   const servicesData = readJson(path.join(DATA_DIR, "services.json"));
 
   const currency = excursionsData.agency?.currency || "USD";
-  const endpoint = excursionsData.emailService?.endpoint || "";
   const excursions = normalizeExcursions(excursionsData.excursions || [], currency);
   const rentals = normalizeRentals(rentalsData.rentals || [], currency);
   const services = normalizeServices(servicesData.services || [], currency);
@@ -1199,10 +1001,17 @@ function main() {
     fs.rmSync(path.join(ROOT, folder), { recursive: true, force: true });
   });
 
+  const orderConfig = {
+    endpoint: excursionsData.orders?.endpoint || "",
+    telegramManager: excursionsData.telegram?.managerUsername || "",
+    whatsappNumber: excursionsData.orders?.whatsappNumber || ""
+  };
+  writeFile(path.join(PUBLIC_DIR, "order-config.json"), `${JSON.stringify(orderConfig, null, 2)}\n`);
+
   const generated = [];
 
   excursions.forEach((item) => {
-    const page = excursionDetailPage(item, endpoint);
+    const page = excursionDetailPage(item);
     writeGeneratedPage(page.path, page.html);
     generated.push(page.path);
   });
@@ -1218,7 +1027,7 @@ function main() {
   generated.push(excursionsIndex.path);
 
   rentals.forEach((item) => {
-    const page = rentalDetailPage(item, endpoint);
+    const page = rentalDetailPage(item);
     writeGeneratedPage(page.path, page.html);
     generated.push(page.path);
   });

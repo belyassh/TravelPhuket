@@ -11,8 +11,8 @@
 - Полнотекстовый поиск по каталогу.
 - SEO-страницы карточек и разделов (генерация из JSON).
 - Форма подбора на главной странице.
-- Бронирование на страницах карточек (включая экскурсии с несколькими программами).
-- Отправка лидов в email endpoint + fallback в Telegram.
+- Корзина заявок: экскурсии, аренда и услуги добавляются со страниц карточек (программа, дата, взрослые/дети), корзина общая для всех страниц.
+- Оформление: имя, телефон, отель для трансфера, затем выбор канала: Telegram-бот (автоматически), личка в Telegram или WhatsApp.
 - Передача UTM и click-id параметров в заявки.
 - Событие `generate_lead` для аналитики/рекламы.
 - Адаптивная верстка для мобильных устройств и десктопа.
@@ -47,7 +47,9 @@ npm run preview  # локальный просмотр dist
 | --- | --- |
 | index.html | Главная страница и шаблон карточки каталога |
 | styles/main.css | Основные стили и адаптивные брейкпоинты |
-| scripts/app.js | Логика каталога, фильтров, форм и аналитики |
+| scripts/app.js | Логика каталога, фильтров, формы подбора и аналитики |
+| scripts/cart.js | Корзина и отправка заявок (копируется в `public/scripts/`) |
+| worker/ | Cloudflare Worker: заявки в Telegram-бота |
 | scripts/generate-pages.cjs | Генерация SEO-страниц и sitemap |
 | data/excursions.json | Данные экскурсий + конфигурация агентства |
 | data/rentals.json | Данные аренды |
@@ -75,7 +77,8 @@ npm run preview  # локальный просмотр dist
 
 - `agency.currency` - валюта цен (`USD`, `EUR` и т.д.)
 - `telegram.managerUsername` - username менеджера без `@`
-- `emailService.endpoint` - endpoint для отправки заявок
+- `orders.endpoint` - адрес Cloudflare Worker, который пересылает заявки в Telegram-бота (см. `worker/README.md`)
+- `orders.whatsappNumber` - номер WhatsApp менеджера цифрами, например `66812345678`
 
 ## Лиды и аналитика
 
@@ -85,7 +88,7 @@ npm run preview  # локальный просмотр dist
 - Click IDs: `gclid`, `fbclid`, `yclid`, `msclkid`
 - Контекст: `landingPage`, `lastPage`, `referrer`
 
-Если email-сервис недоступен, включается fallback в Telegram.
+Заявка собирается в корзине (`scripts/cart.js`) и уходит одним сообщением. Настройка бота и воркера: `worker/README.md`.
 
 ## Деплой
 

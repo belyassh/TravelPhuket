@@ -201,7 +201,7 @@
         <a href="#contacts">Контакты</a>
       </nav>
 
-      <a class="header-booking btn btn-ghost" href="#request">Мои заявки <span>0</span></a>
+      <button class="header-booking btn btn-ghost" type="button" data-cart-open>Корзина <span data-cart-count>0</span></button>
     </header>
 
     <div id="mobileMenuBackdrop" class="mobile-menu-backdrop" aria-hidden="true"></div>
@@ -532,6 +532,7 @@
       </article>
     </template>
 
+    <script type="module" src="scripts/cart.js"></script>
     <script type="module" src="scripts/app.js"></script>
   </body>
 </html>
