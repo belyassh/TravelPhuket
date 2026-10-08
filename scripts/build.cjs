@@ -180,7 +180,7 @@ const ASSET_CSS = `/assets/main.css?v=${hash(read("src", "styles", "main.css"))}
 const ASSET_JS = `/assets/site.js?v=${hash(read("src", "scripts", "site.js"))}`;
 
 function header() {
-  const nav = activeGroups.map((key) => `<a href="${GROUPS[key].href}">${esc(GROUPS[key].short)}</a>`).join("");
+  const nav = activeGroups.map((key) => `<a href="${GROUPS[key].href}">${esc(GROUPS[key].short)}</a>`).join("") + '<a class="nav-quiz" href="/quiz/">Подобрать тур</a>';
   const messengers = [
     waLink ? `<a class="chat-btn chat-wa" href="${waLink}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">${ICONS.wa}<span>WhatsApp</span></a>` : "",
     tgLink ? `<a class="chat-btn chat-tg" href="${tgLink}" target="_blank" rel="noopener" aria-label="Написать в Telegram">${ICONS.tg}<span>Telegram</span></a>` : ""
@@ -359,7 +359,7 @@ function homePage() {
       <input type="search" name="q" placeholder="Куда хотите? Пхи-Пхи, Симиланы, Джеймс Бонд…" aria-label="Поиск экскурсии" autocomplete="off" />
       <button class="btn btn-primary" type="submit">Найти</button>
     </form>
-    <div class="hero-quick">${activeGroups.filter((k) => k !== "other").map((k) => `<a href="${GROUPS[k].href}" data-quick="${k}">${esc(GROUPS[k].short)}</a>`).join("")}</div>
+    <div class="hero-quick"><a class="quick-quiz" href="/quiz/">Подобрать за 30 секунд</a>${activeGroups.filter((k) => k !== "other").map((k) => `<a href="${GROUPS[k].href}" data-quick="${k}">${esc(GROUPS[k].short)}</a>`).join("")}</div>
   </div>
 </section>
 
@@ -367,6 +367,15 @@ function homePage() {
   <div class="container">
     <div class="section-head"><p class="eyebrow">Каталог</p><h2>Что хотите сделать на острове?</h2></div>
     ${catalog({ list: items, chips: allChips(activeGroups, "/", (k) => GROUPS[k].href), activeKey: "all", scope: "all" })}
+  </div>
+</section>
+
+<section class="section section-flush">
+  <div class="container">
+    <div class="quiz-banner">
+      <div><p class="eyebrow">Подбор за 30 секунд</p><h2>Не знаете, что выбрать?</h2><p>Ответьте на 2–4 вопроса, и мы подскажем подходящую программу с учётом того, кто едет.</p></div>
+      <a class="btn btn-primary" href="/quiz/">Подобрать экскурсию</a>
+    </div>
   </div>
 </section>
 
@@ -693,6 +702,52 @@ function textPage(file, h1, pagePath, description) {
   return page({ title: `${h1} | ${site.name}`, description, path: pagePath, body });
 }
 
+function quizPage() {
+  const quiz = readJson("data", "quiz.json");
+  const bySlug = new Map(items.map((i) => [i.slug, i]));
+  const used = new Set();
+  Object.values(quiz.nodes).forEach((node) => node.answers.forEach((a) => (a.result || []).forEach((slug) => used.add(slug))));
+  [...(quiz.rules.fallback || []), ...Object.values(quiz.rules).flatMap((r) => r.exclude || [])].forEach((slug) => used.add(slug));
+  used.forEach((slug) => {
+    if (!bySlug.has(slug)) throw new Error(`quiz.json: нет позиции со slug "${slug}"`);
+  });
+  Object.values(quiz.nodes).forEach((node) => node.answers.forEach((a) => {
+    if (a.next && !quiz.nodes[a.next]) throw new Error(`quiz.json: нет узла "${a.next}"`);
+  }));
+
+  const chat = [
+    waLink ? `<a class="btn btn-ghost" href="${waLink}" target="_blank" rel="noopener">${ICONS.wa}WhatsApp</a>` : "",
+    tgLink ? `<a class="btn btn-ghost" href="${tgLink}" target="_blank" rel="noopener">${ICONS.tg}Telegram</a>` : ""
+  ].join("");
+
+  const body = `<section class="page-head"><div class="container narrow">${breadcrumbs([{ name: "Главная", href: "/" }, { name: "Подбор экскурсии" }])}<h1>Подбор экскурсии</h1><p class="lead">Ответьте на несколько вопросов: покажем программы, которые подходят именно вам.</p></div></section>
+<section class="section section-flush">
+  <div class="container narrow quiz" data-quiz>
+    <div class="quiz-card" data-quiz-stage>
+      <div class="quiz-top"><button class="link-btn" type="button" data-quiz-back hidden>← Назад</button><span class="quiz-step" data-quiz-step></span></div>
+      <h2 data-quiz-question></h2>
+      <p class="quiz-hint" data-quiz-hint hidden></p>
+      <div class="quiz-answers" data-quiz-answers></div>
+    </div>
+    <div class="quiz-result" data-quiz-result hidden>
+      <h2 data-quiz-title>Подходит вам</h2>
+      <p class="lead" data-quiz-note hidden></p>
+      <div class="grid quiz-grid">${[...used].map((slug) => `<div data-quiz-slug="${esc(slug)}" hidden>${card(bySlug.get(slug))}</div>`).join("")}</div>
+      <div class="quiz-actions"><button class="btn btn-ghost" type="button" data-quiz-restart>Пройти заново</button>${chat ? `<span class="quiz-help">Нужна помощь с выбором?</span>${chat}` : ""}</div>
+    </div>
+    <script type="application/json" id="quiz-data">${JSON.stringify(quiz).replace(/</g, "\\u003c")}</script>
+  </div>
+</section>`;
+
+  return page({
+    title: `Подбор экскурсии на Пхукете за 30 секунд | ${site.name}`,
+    description: "Квиз-подбор экскурсии на Пхукете: ответьте на несколько вопросов и получите подходящие программы с учётом возраста детей и состояния здоровья.",
+    path: "/quiz/",
+    body,
+    schema: [breadcrumbSchema([{ name: "Главная", href: "/" }, { name: "Подбор экскурсии", href: "/quiz/" }])]
+  });
+}
+
 function notFoundPage() {
   const body = `<section class="page-head"><div class="container narrow"><h1>Страница не найдена</h1><p class="lead">Возможно, адрес устарел. Вернитесь в каталог и выберите экскурсию.</p><p><a class="btn btn-primary" href="/excursions/">Открыть каталог</a></p></div></section>`;
   return page({ title: `404 | ${site.name}`, description: "Страница не найдена.", path: "/404.html", body, noindex: true });
@@ -711,11 +766,12 @@ function build() {
   catalogPages();
   items.forEach((item) => write(item.url.replace(/^\//, ""), detailPage(item)));
   write("cart.html", cartPage());
+  write("quiz/index.html", quizPage());
   write("privacy.html", textPage("privacy.html", "Политика конфиденциальности", "/privacy.html", "Как мы обрабатываем данные, которые вы указываете в заявке."));
   write("refund-policy.html", textPage("refund-policy.html", "Условия возврата", "/refund-policy.html", "Условия отмены, переноса и возврата для экскурсий и услуг."));
   write("404.html", notFoundPage());
 
-  const urls = ["/", "/excursions/", ...activeGroups.filter((k) => ["sea", "land", "show"].includes(k)).map((k) => GROUPS[k].href), "/rental/", "/services/", ...items.map((i) => i.url), "/privacy.html", "/refund-policy.html"];
+  const urls = ["/", "/excursions/", ...activeGroups.filter((k) => ["sea", "land", "show"].includes(k)).map((k) => GROUPS[k].href), "/rental/", "/services/", "/quiz/", ...items.map((i) => i.url), "/privacy.html", "/refund-policy.html"];
   write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${SITE_URL}${u}</loc><lastmod>${TODAY}</lastmod></url>`).join("\n")}\n</urlset>\n`);
   write("robots.txt", `User-agent: *\nAllow: /\nDisallow: /cart.html\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 

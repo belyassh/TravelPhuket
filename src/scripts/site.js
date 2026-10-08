@@ -296,6 +296,13 @@
     });
   }
 
+  /* мобильная панель «Выбрать дату» прячется, когда форма бронирования уже на экране */
+  const mobileBar = $(".mobile-bar");
+  const bookBlock = $("#book");
+  if (mobileBar && bookBlock && "IntersectionObserver" in window) {
+    new IntersectionObserver(([entry]) => mobileBar.classList.toggle("is-hidden", entry.isIntersecting), { threshold: 0.1 }).observe(bookBlock);
+  }
+
   /* ---------- страница корзины ---------- */
 
   const cartRoot = $("[data-cart-root]");
@@ -508,6 +515,87 @@
     });
 
     renderCart();
+  }
+
+  /* ---------- квиз-подбор ---------- */
+
+  const quizRoot = $("[data-quiz]");
+
+  if (quizRoot) {
+    const data = JSON.parse($("#quiz-data").textContent);
+    const stage = $("[data-quiz-stage]", quizRoot);
+    const result = $("[data-quiz-result]", quizRoot);
+    const elQuestion = $("[data-quiz-question]", quizRoot);
+    const elHint = $("[data-quiz-hint]", quizRoot);
+    const elAnswers = $("[data-quiz-answers]", quizRoot);
+    const elStep = $("[data-quiz-step]", quizRoot);
+    const backBtn = $("[data-quiz-back]", quizRoot);
+    const slots = $$("[data-quiz-slug]", quizRoot);
+    let path = []; // [{ node, index }]
+
+    const flagsOf = () => new Set(path.map((p) => data.nodes[p.node].answers[p.index].flag).filter(Boolean));
+
+    function showNode(id) {
+      const node = data.nodes[id];
+      stage.hidden = false;
+      result.hidden = true;
+      elQuestion.textContent = node.q;
+      elHint.textContent = node.hint || "";
+      elHint.hidden = !node.hint;
+      elStep.textContent = `Вопрос ${path.length + 1}`;
+      backBtn.hidden = path.length === 0;
+      elAnswers.replaceChildren();
+
+      node.answers.forEach((answer, index) => {
+        const button = el("button", "quiz-answer", answer.t);
+        button.type = "button";
+        button.addEventListener("click", () => {
+          path.push({ node: id, index });
+          if (answer.next) showNode(answer.next);
+          else showResult(answer.result);
+        });
+        elAnswers.append(button);
+      });
+      quizRoot.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function showResult(slugs) {
+      const flags = flagsOf();
+      const excluded = new Set([...flags].flatMap((flag) => (data.rules[flag] || {}).exclude || []));
+      let list = slugs.filter((slug) => !excluded.has(slug));
+      const notes = [...flags].map((flag) => (data.rules[flag] || {}).note).filter(Boolean);
+
+      if (!list.length) {
+        list = (data.rules.fallback || []).filter((slug) => !excluded.has(slug));
+        notes.unshift(data.rules.fallbackNote);
+      }
+
+      slots.forEach((slot) => {
+        const index = list.indexOf(slot.dataset.quizSlug);
+        slot.hidden = index === -1;
+        slot.style.order = String(index);
+      });
+
+      const note = $("[data-quiz-note]", result);
+      note.textContent = notes.filter(Boolean).join(" ");
+      note.hidden = !note.textContent;
+      $("[data-quiz-title]", result).textContent = list.length > 1 ? "Подходят вам" : "Подходит вам";
+      stage.hidden = true;
+      result.hidden = false;
+      track("quiz_complete", { results: list.join(","), flags: [...flags].join(",") });
+      quizRoot.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    backBtn.addEventListener("click", () => {
+      const last = path.pop();
+      showNode(last.node);
+    });
+    $("[data-quiz-restart]", quizRoot).addEventListener("click", () => {
+      path = [];
+      showNode(data.start);
+    });
+
+    showNode(data.start);
   }
 
   /* ---------- старт ---------- */

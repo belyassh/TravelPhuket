@@ -1,0 +1,161 @@
+{
+  "start": "need",
+  "nodes": {
+    "need": {
+      "q": "Что вам нужно?",
+      "answers": [
+        {
+          "t": "Экскурсия",
+          "next": "who"
+        },
+        {
+          "t": "Виза и аэропорт",
+          "next": "visa"
+        },
+        {
+          "t": "Транспорт",
+          "next": "transport"
+        }
+      ]
+    },
+    "who": {
+      "q": "Кто едет?",
+      "hint": "У части программ есть ограничения по возрасту и здоровью, поэтому спрашиваем заранее.",
+      "answers": [
+        {
+          "t": "Взрослые и дети от 5 лет",
+          "next": "see"
+        },
+        {
+          "t": "Есть дети до 5 лет",
+          "flag": "kids",
+          "next": "see"
+        },
+        {
+          "t": "Беременные, пожилые или проблемы со спиной и суставами",
+          "flag": "care",
+          "next": "see"
+        }
+      ]
+    },
+    "see": {
+      "q": "Что хочется увидеть?",
+      "answers": [
+        {
+          "t": "Знаменитые Пхи-Пхи",
+          "next": "phiphi"
+        },
+        {
+          "t": "Кораллы и снорклинг",
+          "result": [
+            "similan-islands"
+          ]
+        },
+        {
+          "t": "Спокойно, каяки, виды",
+          "result": [
+            "james-bond-phang-nga"
+          ]
+        },
+        {
+          "t": "Город и храмы",
+          "result": [
+            "phuket-city-tour"
+          ]
+        }
+      ]
+    },
+    "phiphi": {
+      "q": "Что для вас важнее?",
+      "answers": [
+        {
+          "t": "Малая группа и скорость",
+          "result": [
+            "phi-phi-speedboat"
+          ]
+        },
+        {
+          "t": "Рассвет и меньше людей",
+          "result": [
+            "phi-phi-early-dawn-maya-bay"
+          ]
+        },
+        {
+          "t": "Оптимальная цена",
+          "result": [
+            "phi-phi-maya-bay-snorkeling"
+          ]
+        }
+      ]
+    },
+    "visa": {
+      "q": "Что именно нужно?",
+      "answers": [
+        {
+          "t": "Продлить визу выездом",
+          "result": [
+            "border-run-same-day"
+          ]
+        },
+        {
+          "t": "Пройти аэропорт без очередей",
+          "result": [
+            "fast-track-arrival-phuket",
+            "fast-track-departure-phuket"
+          ]
+        },
+        {
+          "t": "Добраться по острову",
+          "result": [
+            "private-transfer-phuket"
+          ]
+        }
+      ]
+    },
+    "transport": {
+      "q": "Что арендовать?",
+      "answers": [
+        {
+          "t": "Скутер",
+          "result": [
+            "moto-scooter-150-urban-ride"
+          ]
+        },
+        {
+          "t": "Автомобиль",
+          "result": [
+            "suv-comfort-5-seats"
+          ]
+        },
+        {
+          "t": "Яхта или катамаран",
+          "result": [
+            "catamaran-sunset-cruise"
+          ]
+        }
+      ]
+    }
+  },
+  "rules": {
+    "kids": {
+      "exclude": [
+        "phi-phi-speedboat",
+        "phuket-city-tour"
+      ],
+      "note": "Мы учли возраст детей: у части программ минимум 5 лет. Возраст каждого ребёнка укажите в заявке."
+    },
+    "care": {
+      "exclude": [
+        "phi-phi-speedboat",
+        "phi-phi-early-dawn-maya-bay",
+        "phi-phi-maya-bay-snorkeling",
+        "similan-islands"
+      ],
+      "note": "Мы учли ограничения по здоровью: морские маршруты с качкой и нагрузкой скрыты. Детали уточнит менеджер."
+    },
+    "fallback": [
+      "james-bond-phang-nga"
+    ],
+    "fallbackNote": "В выбранном направлении нет программ, подходящих вашей группе, поэтому предлагаем ближайшую спокойную альтернативу."
+  }
+}
