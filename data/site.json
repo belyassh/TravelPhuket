@@ -6,11 +6,11 @@
   "hours": "09:00–21:00",
   "contacts": {
     "telegram": "hitachi315",
-    "whatsapp": "",
+    "whatsapp": "79140731105",
     "email": "hello@nikophuket.com"
   },
   "orders": {
-    "endpoint": ""
+    "endpoint": "https://nikoorders.nikitahill099.workers.dev/"
   },
   "analyticsId": "G-VRKTR3SHH0"
 }
