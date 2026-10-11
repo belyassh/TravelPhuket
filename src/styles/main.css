@@ -105,6 +105,9 @@ ul, ol { margin: 0; padding: 0; }
 .chat-btn:hover { filter: brightness(1.08); }
 .chat-btn svg { width: 20px; height: 20px; }
 .chat-wa { background: var(--wa); }
+.chat-ig { background: linear-gradient(45deg, #f9a03f, #e1306c 55%, #7b3fe4); }
+.chat-ig span { display: none; }
+.chat-ig { width: 42px; padding: 0; justify-content: center; }
 .chat-tg { background: var(--tg); }
 
 .cart-link { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--ink); color: var(--ink); transition: background 0.15s, color 0.15s; }
@@ -479,3 +482,108 @@ input:user-invalid, select:user-invalid { border-color: var(--coral); }
   .quiz-banner .btn { width: 100%; }
   .quiz-help { width: 100%; margin: 8px 0 0; }
 }
+
+/* ---------- меню «Экскурсии» ---------- */
+
+.nav-drop { position: relative; }
+.nav-drop-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 0; border-radius: 999px; background: transparent; font: inherit; font-weight: 600; font-size: 0.95rem; color: var(--ink-soft); cursor: pointer; transition: background 0.15s, color 0.15s; }
+.nav-drop-btn svg { width: 16px; height: 16px; transition: transform 0.2s; }
+.nav-drop-btn:hover, .nav-drop.is-open .nav-drop-btn { background: var(--sand-deep); color: var(--ink); }
+.nav-drop.is-open .nav-drop-btn svg { transform: rotate(180deg); }
+.nav-panel { position: absolute; top: calc(100% + 10px); left: 0; z-index: 60; display: none; min-width: 320px; padding: 10px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.nav-drop.is-open .nav-panel { display: grid; }
+@media (hover: hover) and (min-width: 961px) { .nav-drop:hover .nav-panel { display: grid; } .nav-drop:hover .nav-drop-btn { background: var(--sand-deep); color: var(--ink); } }
+.nav-panel a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem; text-decoration: none; color: var(--ink); }
+.nav-panel a:hover { background: var(--sand); }
+.nav-panel a span { width: 24px; text-align: center; }
+
+/* ---------- обложки без фото ---------- */
+
+.cover { display: grid; place-items: center; width: 100%; height: 100%; background: linear-gradient(150deg, #0e7c86, #0f2a33); }
+.cover i { font-style: normal; font-size: 3.4rem; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3)); }
+.cover-islands { background: linear-gradient(150deg, #11a0a8, #0f4a5c); }
+.cover-phangnga { background: linear-gradient(150deg, #2f8f7a, #12384a); }
+.cover-land { background: linear-gradient(150deg, #5d9a4f, #1f4a35); }
+.cover-active { background: linear-gradient(150deg, #e2583a, #7d2a6a); }
+.cover-family { background: linear-gradient(150deg, #f0a33c, #d2562f); }
+.cover-show { background: linear-gradient(150deg, #8a3fb5, #2a1448); }
+.cover-premium { background: linear-gradient(150deg, #1d3557, #0a1624); }
+.cover-trips { background: linear-gradient(150deg, #3a7bd5, #1b2f6b); }
+.cover-visa { background: linear-gradient(150deg, #b8860b, #4d3a0f); }
+.cover-rental { background: linear-gradient(150deg, #607d8b, #263238); }
+.cover-other { background: linear-gradient(150deg, #0e7c86, #0f2a33); }
+.cover-banner { display: grid; place-items: center; height: clamp(120px, 20vw, 200px); margin-bottom: 20px; border-radius: var(--radius); overflow: hidden; }
+.cover-banner i { font-style: normal; font-size: clamp(3rem, 8vw, 5rem); }
+.card-media { position: relative; }
+.badge { position: absolute; top: 14px; left: 14px; padding: 4px 12px; border-radius: 999px; background: var(--coral); color: var(--white); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.js [data-extra] { display: none; }
+.more { display: flex; justify-content: center; margin-top: 32px; }
+
+/* ---------- программы, цены, суда ---------- */
+
+.program { background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); padding: 0; }
+.program > summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; padding: 18px 56px 18px 24px; list-style: none; cursor: pointer; position: relative; }
+.program > summary::-webkit-details-marker { display: none; }
+.program > summary::after { content: "+"; position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font-size: 1.5rem; color: var(--sea); transition: transform 0.2s; }
+.program[open] > summary::after { transform: translateY(-50%) rotate(45deg); }
+.program-name { font-weight: 800; font-size: 1.08rem; }
+.program-price { font-weight: 800; color: var(--coral-deep); }
+.program-body { padding: 0 24px 24px; display: grid; gap: 12px; }
+.program-body h3, .program-body h4 { font-size: 1rem; margin-top: 10px; }
+.program-body p { color: var(--ink-soft); font-size: 0.98rem; }
+.program-body .note { padding: 14px 18px; margin-top: 4px; }
+.block-flow { display: grid; gap: 14px; }
+.block-flow h3 { font-size: 1.3rem; margin-top: 14px; }
+.pricelist { list-style: none; display: grid; gap: 8px; }
+.pricelist li { padding: 10px 14px; background: var(--sand); border-radius: 10px; font-weight: 600; font-size: 0.96rem; }
+.pricelist.soft li { background: transparent; border: 1px dashed var(--line); font-weight: 500; color: var(--ink-soft); }
+.fleet-list { list-style: disc; padding-left: 20px; display: grid; gap: 4px; color: var(--ink-soft); font-size: 0.96rem; }
+.photo-link { font-weight: 700; }
+
+/* ---------- Instagram и карта ---------- */
+
+.ig-strip { display: flex; align-items: center; gap: 20px; padding: 22px clamp(20px, 3vw, 32px); border-radius: var(--radius); background: linear-gradient(110deg, #f9a03f, #e1306c 55%, #7b3fe4); color: var(--white); text-decoration: none; box-shadow: var(--shadow); transition: transform 0.2s; }
+.ig-strip:hover { transform: translateY(-2px); }
+.ig-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: rgba(255, 255, 255, 0.22); flex-shrink: 0; }
+.ig-icon svg { width: 28px; height: 28px; }
+.ig-text { display: grid; gap: 2px; }
+.ig-text strong { font-size: 1.2rem; }
+.ig-text small { opacity: 0.9; font-size: 0.95rem; }
+.ig-go { margin-left: auto; width: 28px; height: 28px; flex-shrink: 0; }
+
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 48px; align-items: center; }
+.contact-hours { margin: 6px 0 22px; font-weight: 600; color: var(--ink-soft); }
+.contact-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.contact-actions .btn svg { width: 20px; height: 20px; }
+.map-link { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.map-link svg { width: 20px; height: 20px; color: var(--coral); }
+.map-frame { overflow: hidden; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--line); aspect-ratio: 4 / 3; background: var(--sand-deep); }
+.map-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+@media (max-width: 960px) {
+  .nav-drop-btn { width: 100%; justify-content: space-between; padding: 16px 18px; font-size: 1.15rem; color: var(--ink); border-bottom: 1px solid var(--line); border-radius: 0; }
+  .nav-panel { position: static; min-width: 0; margin: 0 0 8px; padding: 4px 0 4px 12px; border: 0; box-shadow: none; background: transparent; }
+  .contact-grid { grid-template-columns: 1fr; gap: 28px; }
+}
+
+@media (max-width: 720px) {
+  .chat-ig { display: none; }
+  .ig-strip { padding: 18px; gap: 14px; }
+  .ig-text strong { font-size: 1.05rem; }
+  .ig-text small { font-size: 0.85rem; }
+  .program > summary { padding: 16px 48px 16px 18px; }
+  .program-body { padding: 0 18px 20px; }
+  .cover i { font-size: 2.8rem; }
+}
+
+.main-nav a, .nav-drop-btn { white-space: nowrap; }
+@media (max-width: 1280px) and (min-width: 961px) {
+  .chat-btn span { display: none; }
+  .chat-btn { width: 42px; padding: 0; justify-content: center; }
+  .main-nav a, .nav-drop-btn { padding-inline: 10px; }
+  .header-inner { gap: 16px; }
+}
+
+.section-tight { padding: 8px 0 0; }
+#contacts { padding-top: clamp(40px, 6vw, 72px); }

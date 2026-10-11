@@ -6,6 +6,8 @@
  *   TELEGRAM_BOT_TOKEN  (Secret)  токен от @BotFather
  *   TELEGRAM_CHAT_IDS   (Text)    chat_id получателей через запятую: личный чат, группа и т.д.
  *   ALLOWED_ORIGINS     (Text)    https://nikophuket.com,https://www.nikophuket.com
+ *   SHEETS_WEBHOOK_URL  (Text)    необязательно: адрес веб-приложения Google Apps Script (см. sheets/README.md)
+ *   SHEETS_SECRET       (Secret)  необязательно: общий секрет с Apps Script
  */
 
 const MAX_TEXT_LENGTH = 3800; // лимит Telegram 4096 символов
@@ -55,19 +57,25 @@ export default {
     }
 
     const chatIds = (env.TELEGRAM_CHAT_IDS || "").split(",").map((item) => item.trim()).filter(Boolean);
-    if (!env.TELEGRAM_BOT_TOKEN || !chatIds.length) {
+    const telegramReady = Boolean(env.TELEGRAM_BOT_TOKEN && chatIds.length);
+    const sheetsReady = Boolean(env.SHEETS_WEBHOOK_URL && env.SHEETS_SECRET);
+    if (!telegramReady && !sheetsReady) {
       return json({ ok: false, error: "not_configured" }, 500, cors);
     }
 
     const replyUrl = buildReplyUrl(body.contact);
-    const results = await Promise.all(chatIds.map((chatId) => sendToTelegram(env.TELEGRAM_BOT_TOKEN, chatId, text, replyUrl)));
+    const [results, sheet] = await Promise.all([
+      Promise.all((telegramReady ? chatIds : []).map((chatId) => sendToTelegram(env.TELEGRAM_BOT_TOKEN, chatId, text, replyUrl))),
+      sheetsReady && body.order ? sendToSheet(env, body.order) : Promise.resolve(false)
+    ]);
     const delivered = results.filter(Boolean).length;
 
-    if (!delivered) {
-      return json({ ok: false, error: "telegram_failed" }, 502, cors);
+    // заявка не потеряна, если дошла хотя бы в одно место: бот или таблица
+    if (!delivered && !sheet) {
+      return json({ ok: false, error: "delivery_failed" }, 502, cors);
     }
 
-    return json({ ok: true, delivered }, 200, cors);
+    return json({ ok: true, delivered, sheet }, 200, cors);
   }
 };
 
@@ -100,6 +108,44 @@ async function sendToTelegram(token, chatId, text, reply) {
       body: JSON.stringify(payload)
     });
     return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+// Таблица Google: заявка уходит в веб-приложение Apps Script, которое добавляет строку
+const cut = (value, max = 500) => String(value ?? "").slice(0, max);
+
+async function sendToSheet(env, order) {
+  try {
+    const customer = order.customer || {};
+    const safe = {
+      id: cut(order.id, 40),
+      customer: {
+        name: cut(customer.name, 120),
+        phone: cut(customer.phone, 40),
+        method: customer.method === "telegram" ? "telegram" : "whatsapp",
+        nick: cut(customer.nick, 60),
+        hotel: cut(customer.hotel, 160),
+        comment: cut(customer.comment, 800)
+      },
+      items: (Array.isArray(order.items) ? order.items : []).slice(0, 30).map((item) => ({
+        kind: cut(item.kind, 20), group: cut(item.group, 80), title: cut(item.title, 200), program: cut(item.program, 200),
+        priceLabel: cut(item.priceLabel, 120), date: cut(item.date, 20), adults: Number(item.adults) || 0, children: Number(item.children) || 0,
+        duration: cut(item.duration, 60), comment: cut(item.comment, 400), url: cut(item.url, 300)
+      })),
+      source: Object.fromEntries(Object.entries(order.source || {}).slice(0, 8).map(([k, v]) => [cut(k, 30), cut(v, 200)]))
+    };
+
+    const response = await fetch(env.SHEETS_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ secret: env.SHEETS_SECRET, order: safe }),
+      redirect: "follow"
+    });
+    if (!response.ok) return false;
+    const result = await response.json().catch(() => ({}));
+    return result.ok === true;
   } catch {
     return false;
   }

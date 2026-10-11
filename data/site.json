@@ -6,11 +6,24 @@
   "hours": "09:00–21:00",
   "contacts": {
     "telegram": "hitachi315",
-    "whatsapp": "79140731105",
-    "email": "hello@nikophuket.com"
+    "whatsapp": "",
+    "email": "hello@nikophuket.com",
+    "instagram": "https://www.instagram.com/nikolai_phuket/"
   },
   "orders": {
-    "endpoint": "https://nikoorders.nikitahill099.workers.dev/"
+    "endpoint": ""
   },
-  "analyticsId": "G-VRKTR3SHH0"
+  "analyticsId": "G-VRKTR3SHH0",
+  "address": {
+    "line": "52/3, 200 Rat Uthit Song Roi Pi Rd, Pa Tong, Kathu District, Phuket 83150, Thailand",
+    "street": "52/3, 200 Rat Uthit Song Roi Pi Rd",
+    "locality": "Pa Tong, Kathu District",
+    "region": "Phuket",
+    "postalCode": "83150",
+    "country": "TH"
+  },
+  "redirects": {
+    "/excursions/phi-phi-speedboat.html": "/excursions/phi-phi-maya-bay-snorkeling.html",
+    "/rental/catamaran-sunset-cruise.html": "/excursions/catamaran-rental.html"
+  }
 }

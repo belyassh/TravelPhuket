@@ -69,42 +69,6 @@
         "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80",
         "https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&q=80"
       ]
-    },
-    {
-      "id": "yacht-catamaran-sunset",
-      "slug": "catamaran-sunset-cruise",
-      "group": "yachts-catamarans",
-      "title": "Катамаран Sunset Cruise",
-      "overview": "Полудневный чартер для компании до 10 гостей.",
-      "description": "Приватный выход в море с купанием и закатом. Подходит для дней рождения, семейных прогулок и фотосессий.",
-      "category": "yachts-catamarans",
-      "specs": "15м | 10 гостей | Экипаж 2 человека | 2 палубы",
-      "duration": "4-5 часов",
-      "requirements": [
-        "Умение плавать рекомендуется",
-        "Возраст от 5 лет с родителями",
-        "Здоровое сердечно-сосудистое состояние"
-      ],
-      "prices": {
-        "day": 14700,
-        "week": 85750,
-        "month": 311500,
-        "year": 3395000
-      },
-      "deposit": "17500 THB",
-      "transmission": "Капитан включен",
-      "included": [
-        "Экипаж и топливо в базовом пакете",
-        "Маски для снорклинга и трубки",
-        "Питьевая вода и лед",
-        "Спасательные жилеты",
-        "Страховка 100 000 THB"
-      ],
-      "notes": "При морской качке рекомендуется таблетка от укачивания (куплю в аптеке за 20 THB). Шанс выхода в море 95% с ноября по апрель. Возврат 100% если отменим мы из-за погоды.",
-      "images": [
-        "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
-      ]
     }
   ]
 }

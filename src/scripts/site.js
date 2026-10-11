@@ -118,6 +118,22 @@
     });
   }
 
+  const drop = $("[data-drop]");
+  if (drop) {
+    const dropBtn = $("[data-drop-btn]", drop);
+    const setDrop = (open) => {
+      drop.classList.toggle("is-open", open);
+      dropBtn.setAttribute("aria-expanded", String(open));
+    };
+    dropBtn.addEventListener("click", () => setDrop(!drop.classList.contains("is-open")));
+    document.addEventListener("click", (event) => {
+      if (!drop.contains(event.target)) setDrop(false);
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setDrop(false);
+    });
+  }
+
   const onScroll = () => header && header.classList.toggle("is-scrolled", window.scrollY > 8);
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
@@ -144,7 +160,10 @@
     const chips = $$("[data-chip]", catalogRoot);
     const input = $("[data-search-input]", catalogRoot);
     const empty = $("[data-empty]", catalogRoot);
-    const state = { chip: "all", query: "" };
+    const moreBtn = $("[data-more]", catalogRoot);
+    const step = Number(catalogRoot.dataset.initial) || 12;
+    const state = { chip: "all", query: "", limit: step };
+    cards.forEach((card) => card.removeAttribute("data-extra"));
 
     const params = new URLSearchParams(location.search);
     if (scope === "all") {
@@ -156,15 +175,23 @@
 
     const apply = () => {
       const tokens = normalize(state.query).split(/\s+/).filter(Boolean);
-      let visible = 0;
+      const filtering = tokens.length > 0 || (scope === "all" && state.chip !== "all");
+      let matched = 0;
+      let hiddenByLimit = 0;
 
       cards.forEach((card) => {
         const inChip = scope !== "all" || state.chip === "all" || card.dataset.group === state.chip;
-        const haystack = card.dataset.search || "";
-        const inQuery = tokens.every((token) => haystack.includes(token));
-        const show = inChip && inQuery;
+        const inQuery = tokens.every((token) => (card.dataset.search || "").includes(token));
+        const match = inChip && inQuery;
+        let show = match;
+        if (match) {
+          matched += 1;
+          if (!filtering && matched > state.limit) {
+            show = false;
+            hiddenByLimit += 1;
+          }
+        }
         card.hidden = !show;
-        if (show) visible += 1;
       });
 
       if (scope === "all") {
@@ -176,7 +203,11 @@
         });
       }
 
-      if (empty) empty.hidden = visible > 0;
+      if (moreBtn) {
+        moreBtn.parentElement.hidden = hiddenByLimit === 0;
+        moreBtn.textContent = `Показать ещё ${Math.min(step, hiddenByLimit)}`;
+      }
+      if (empty) empty.hidden = matched > 0;
 
       const next = new URLSearchParams();
       if (scope === "all" && state.chip !== "all") next.set("c", state.chip);
@@ -191,6 +222,7 @@
         if (scope !== "all") return; // на странице категории чипы ведут на другие страницы
         event.preventDefault();
         state.chip = chip.dataset.chip;
+        state.limit = step;
         apply();
       });
     });
@@ -198,6 +230,13 @@
     if (input) {
       input.addEventListener("input", () => {
         state.query = input.value;
+        apply();
+      });
+    }
+
+    if (moreBtn) {
+      moreBtn.addEventListener("click", () => {
+        state.limit += step;
         apply();
       });
     }
@@ -218,9 +257,10 @@
 
     $$("[data-quick]").forEach((link) => {
       link.addEventListener("click", (event) => {
-        if (scope !== "all") return;
+        if (scope !== "all" || !chips.some((chip) => chip.dataset.chip === link.dataset.quick)) return;
         event.preventDefault();
         state.chip = link.dataset.quick;
+        state.limit = step;
         apply();
         jumpToCatalog();
       });
@@ -271,6 +311,7 @@
         title: booking.dataset.title,
         url: booking.dataset.url,
         image: booking.dataset.image,
+        group: booking.dataset.group || "",
         program: option ? option.value : "",
         departure: option ? option.dataset.departure || "" : "",
         priceLabel: option ? option.dataset.price || "" : booking.dataset.price || "",
@@ -492,7 +533,13 @@
           body: JSON.stringify({
             text: buildMessage(pendingOrderId, customer),
             website: value("website"),
-            contact: { method: customer.method, phone: customer.phone, nick: customer.nick }
+            contact: { method: customer.method, phone: customer.phone, nick: customer.nick },
+            order: {
+              id: pendingOrderId,
+              customer,
+              items: cart.map((i) => ({ kind: i.kind, group: i.group || "", title: i.title, program: i.program, priceLabel: i.priceLabel, date: i.date, adults: i.adults, children: i.children, duration: i.duration, comment: i.comment, url: location.origin + i.url })),
+              source: { utm_source: marketing.utm_source || "", utm_medium: marketing.utm_medium || "", utm_campaign: marketing.utm_campaign || "", gclid: marketing.gclid || "", referrer: marketing.referrer || "" }
+            }
           })
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -522,18 +569,45 @@
   const quizRoot = $("[data-quiz]");
 
   if (quizRoot) {
-    const data = JSON.parse($("#quiz-data").textContent);
+    const payload = JSON.parse($("#quiz-data").textContent);
+    const data = payload.quiz;
+    const bySlug = new Map(payload.items.map((item) => [item.s, item]));
+    const excursions = payload.items.filter((item) => item.k < 500);
     const stage = $("[data-quiz-stage]", quizRoot);
     const result = $("[data-quiz-result]", quizRoot);
     const elQuestion = $("[data-quiz-question]", quizRoot);
     const elHint = $("[data-quiz-hint]", quizRoot);
     const elAnswers = $("[data-quiz-answers]", quizRoot);
     const elStep = $("[data-quiz-step]", quizRoot);
+    const elGrid = $("[data-quiz-grid]", quizRoot);
     const backBtn = $("[data-quiz-back]", quizRoot);
-    const slots = $$("[data-quiz-slug]", quizRoot);
+    const rules = data.rules;
     let path = []; // [{ node, index }]
 
-    const flagsOf = () => new Set(path.map((p) => data.nodes[p.node].answers[p.index].flag).filter(Boolean));
+    const answerAt = (entry) => data.nodes[entry.node].answers[entry.index];
+    const flags = () => new Set(path.map((entry) => answerAt(entry).flag).filter(Boolean));
+    const themeOf = () => (path.map(answerAt).find((answer) => answer.theme) || {}).theme;
+    const money = (value) => `${new Intl.NumberFormat("ru-RU").format(value)}\u00a0฿`;
+    const esc = (text) => String(text == null ? "" : text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // правила безопасности: возраст и здоровье
+    const allowed = (item, active) => {
+      if (active.has("kids") && item.a > rules.kids.excludeMinAgeAbove) return false;
+      if (active.has("baby") && item.a >= rules.baby.excludeMinAgeAtLeast) return false;
+      if (active.has("care") && item.r.some((r) => rules.care.excludeRestrictions.includes(r))) return false;
+      return true;
+    };
+
+    const cardHtml = (item) => `<article class="card">
+      <a class="card-media" href="${esc(item.u)}" tabindex="-1" aria-hidden="true">${item.i
+        ? `<img src="${esc(item.i)}" alt="" width="800" height="600" loading="lazy" />`
+        : `<span class="cover cover-${esc(item.g)}"><i>${esc(item.e)}</i></span>`}${item.b ? `<span class="badge">${esc(item.b)}</span>` : ""}</a>
+      <div class="card-body">
+        <p class="card-tag">${esc(item.l)}</p>
+        <h3 class="card-title"><a href="${esc(item.u)}">${esc(item.t)}</a></h3>
+        <p class="card-text">${esc(item.o)}</p>
+        <div class="card-foot">${item.p ? `<p class="card-price"><small>от</small> ${money(item.p)} <small>${esc(item.n)}</small></p>` : '<p class="card-price">Цена по запросу</p>'}${item.d ? `<span class="card-meta">${esc(item.d)}</span>` : ""}</div>
+      </div></article>`;
 
     function showNode(id) {
       const node = data.nodes[id];
@@ -549,40 +623,68 @@
       node.answers.forEach((answer, index) => {
         const button = el("button", "quiz-answer", answer.t);
         button.type = "button";
-        button.addEventListener("click", () => {
-          path.push({ node: id, index });
-          if (answer.next) showNode(answer.next);
-          else showResult(answer.result);
-        });
+        button.addEventListener("click", () => choose(id, index));
         elAnswers.append(button);
       });
       quizRoot.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    function showResult(slugs) {
-      const flags = flagsOf();
-      const excluded = new Set([...flags].flatMap((flag) => (data.rules[flag] || {}).exclude || []));
-      let list = slugs.filter((slug) => !excluded.has(slug));
-      const notes = [...flags].map((flag) => (data.rules[flag] || {}).note).filter(Boolean);
+    function choose(id, index) {
+      const answer = data.nodes[id].answers[index];
+      path.push({ node: id, index });
 
-      if (!list.length) {
-        list = (data.rules.fallback || []).filter((slug) => !excluded.has(slug));
-        notes.unshift(data.rules.fallbackNote);
+      if (answer.next) return showNode(answer.next);
+      if (answer.result) return showResult(answer.result.map((slug) => bySlug.get(slug)).filter(Boolean), false);
+
+      const active = flags();
+      const theme = themeOf();
+      let list = excursions.filter((item) => item.tg.includes(theme)).filter((item) => allowed(item, active));
+
+      if (answer.theme) {
+        // слишком много вариантов: уточняем вопросом, если он задан для этой темы
+        if (answer.refine && list.length > rules.maxResults) return showNode(answer.refine);
+        return showResult(list, true);
       }
 
-      slots.forEach((slot) => {
-        const index = list.indexOf(slot.dataset.quizSlug);
-        slot.hidden = index === -1;
-        slot.style.order = String(index);
-      });
+      const filter = answer.filter || {};
+      const narrowed = list.filter((item) => (!filter.tag || item.tg.includes(filter.tag)) && (!filter.maxPrice || (item.p && item.p <= filter.maxPrice)));
+      return showResult(narrowed.length ? narrowed : list, true);
+    }
+
+    function showResult(list, ranked) {
+      const active = flags();
+      const notes = [...active].map((flag) => (rules[flag] || {}).note).filter(Boolean);
+      let shown = ranked ? [...list].sort((a, b) => a.k - b.k) : list;
+
+      if (!shown.length) {
+        shown = (rules.fallback || []).map((slug) => bySlug.get(slug)).filter((item) => item && allowed(item, active));
+        notes.unshift(rules.fallbackNote);
+      }
+
+      const first = shown.slice(0, rules.maxResults);
+      const rest = shown.slice(rules.maxResults);
+      elGrid.innerHTML = first.map(cardHtml).join("");
+
+      const oldMore = $("[data-quiz-more]", result);
+      if (oldMore) oldMore.remove();
+      if (rest.length) {
+        const more = el("button", "btn btn-ghost", `Показать ещё ${rest.length}`);
+        more.type = "button";
+        more.dataset.quizMore = "";
+        more.addEventListener("click", () => {
+          elGrid.insertAdjacentHTML("beforeend", rest.map(cardHtml).join(""));
+          more.remove();
+        });
+        elGrid.after(more);
+      }
 
       const note = $("[data-quiz-note]", result);
       note.textContent = notes.filter(Boolean).join(" ");
       note.hidden = !note.textContent;
-      $("[data-quiz-title]", result).textContent = list.length > 1 ? "Подходят вам" : "Подходит вам";
+      $("[data-quiz-title]", result).textContent = first.length > 1 ? "Подходят вам" : "Подходит вам";
       stage.hidden = true;
       result.hidden = false;
-      track("quiz_complete", { results: list.join(","), flags: [...flags].join(",") });
+      track("quiz_complete", { results: first.map((i) => i.s).join(","), flags: [...active].join(","), theme: themeOf() || "" });
       quizRoot.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 

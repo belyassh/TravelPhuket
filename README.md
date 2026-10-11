@@ -23,12 +23,20 @@ Node.js 18+. Устанавливать пакеты не нужно.
 | `data/site.json` | Контакты, часы работы, адрес воркера, ID аналитики |
 | `data/excursions.json`, `rentals.json`, `services.json` | Каталог. После правки достаточно `npm run build` |
 | `scripts/build.cjs` | Генератор всех страниц, sitemap и robots |
+| `sheets/` | Google Apps Script и инструкция: заявки автоматически попадают в таблицу со статусами |
 | `src/styles/main.css` | Единый файл стилей |
 | `src/scripts/site.js` | Фильтр и поиск, форма бронирования, корзина, отправка |
 | `data/quiz.json` | Дерево квиза: вопросы, ответы, ссылки на экскурсии по `slug`, правила для детей и здоровья. Описание ниже |
 | `content/` | Тексты политик (HTML-фрагменты) |
 | `static/` | Копируется в корень сайта: логотип, favicon, CNAME, og-картинка |
 | `worker/` | Cloudflare Worker: заявки в Telegram-бота. Настройка в `worker/README.md` |
+
+## Каталог
+
+Около 60 позиций из документа с экскурсиями: острова, Пханг Нга и Краби, наземные туры, активный отдых, семья, шоу, Premium (яхты и катамараны), туры в другие страны. Все карточки лежат в `data/excursions.json`.
+
+Поля позиции: `slug`, `category` (`islands`, `phangnga`, `land`, `active`, `family`, `show`, `premium`, `trips`), `title`, `overview`, `description[]`, `price` (от, за единицу), `priceUnit`, `duration`, `badge`, `tags[]` (темы для поиска и квиза), `minAge`, `restrictions[]` (`pregnant`, `elderly`, `mobility`), `images[]`, `programs[]` (варианты со своими ценой, расписанием, включено), `priceLines[]`, `itinerary[]`, `included[]`, `bring[]`, `notes[]`, `fleet[]` (для аренды судов). Порядок позиций в файле задаёт порядок на сайте.
+Фото кладите в `static/img/` и указывайте путь `/img/имя.jpg`. Без фото карточка показывает цветную обложку категории.
 
 ## Что нужно заполнить перед запуском
 
