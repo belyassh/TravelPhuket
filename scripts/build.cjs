@@ -406,7 +406,6 @@ function instagramStrip() {
 }
 
 function homePage() {
-  const topImage = image(items.find((i) => i.images.length) || items[0]);
   const steps = [
     ["Выберите", "Откройте экскурсию, прочитайте программу и выберите дату и количество гостей."],
     ["Добавьте в корзину", "Можно собрать несколько экскурсий и отправить одной заявкой."],
@@ -420,7 +419,18 @@ function homePage() {
   ];
   const quick = [...excursionGroups, "visa", "rental"].filter(hasGroup).slice(0, 6);
 
-  const body = `<section class="hero"${topImage ? ` style="--hero-image:url('${esc(topImage)}')"` : ""}>
+  const slides = (site.hero?.images || []).filter(Boolean);
+  const SLIDE = 6; // секунд на кадр
+  const frame = 100 / Math.max(slides.length, 1);
+  const heroCss = slides.length > 1
+    ? `<style>.hero-slides img{animation:heroFade ${slides.length * SLIDE}s infinite}${slides.map((_, i) => `.hero-slides img:nth-child(${i + 1}){animation-delay:${i * SLIDE}s}`).join("")}@keyframes heroFade{0%{opacity:0}${(frame * 0.12).toFixed(1)}%{opacity:1}${frame.toFixed(1)}%{opacity:1}${(frame * 1.12).toFixed(1)}%{opacity:0}100%{opacity:0}}</style>`
+    : "";
+  const slidesHtml = slides.length
+    ? `<div class="hero-slides" aria-hidden="true">${slides.map((src, i) => `<img src="${esc(src)}" alt="" width="1920" height="1080"${i === 0 ? ' fetchpriority="high"' : ' loading="lazy"'} decoding="async" />`).join("")}</div>`
+    : "";
+
+  const body = `${heroCss}<section class="hero${slides.length ? " has-photo" : ""}">
+  ${slidesHtml}
   <div class="container hero-inner">
     <p class="eyebrow">Пхукет · Таиланд</p>
     <h1>Экскурсии на Пхукете</h1>

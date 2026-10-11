@@ -25,5 +25,12 @@
   "redirects": {
     "/excursions/phi-phi-speedboat.html": "/excursions/phi-phi-maya-bay-snorkeling.html",
     "/rental/catamaran-sunset-cruise.html": "/excursions/catamaran-rental.html"
+  },
+  "hero": {
+    "images": [
+      "/img/hero-1.jpg",
+      "/img/hero-2.jpg",
+      "/img/hero-4.jpg"
+    ]
   }
 }

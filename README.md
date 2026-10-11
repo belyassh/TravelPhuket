@@ -38,6 +38,10 @@ Node.js 18+. Устанавливать пакеты не нужно.
 Поля позиции: `slug`, `category` (`islands`, `phangnga`, `land`, `active`, `family`, `show`, `premium`, `trips`), `title`, `overview`, `description[]`, `price` (от, за единицу), `priceUnit`, `duration`, `badge`, `tags[]` (темы для поиска и квиза), `minAge`, `restrictions[]` (`pregnant`, `elderly`, `mobility`), `images[]`, `programs[]` (варианты со своими ценой, расписанием, включено), `priceLines[]`, `itinerary[]`, `included[]`, `bring[]`, `notes[]`, `fleet[]` (для аренды судов). Порядок позиций в файле задаёт порядок на сайте.
 Фото кладите в `static/img/` и указывайте путь `/img/имя.jpg`. Без фото карточка показывает цветную обложку категории.
 
+## Баннер на главной
+
+Слайдшоу из фото берётся из `data/site.json`, поле `hero.images` (смена кадра каждые 6 секунд, без скриптов). Чтобы добавить кадр, например Большого Будду, положите фото в `static/img/` (лучше 1920×1080, горизонтальное, светлое) и впишите путь в список: `"/img/hero-buddha.jpg"`.
+
 ## Что нужно заполнить перед запуском
 
 1. В `data/site.json`: `contacts.whatsapp` (номер цифрами) и `orders.endpoint` (адрес воркера).
