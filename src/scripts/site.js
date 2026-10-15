@@ -10,6 +10,8 @@
   const CUSTOMER_KEY = "niko:customer:v2";
   const CATALOG_KEY = "niko:last-catalog";
   const MARKETING_KEY = "niko:marketing";
+  const REF_KEY = "niko:ref";
+  const REF_DAYS = 30;
   const MAX_ITEMS = 20;
 
   const config = (() => {
@@ -72,6 +74,12 @@
       if (params.get(key)) context[key] = params.get(key);
     });
     store.set(sessionStorage, MARKETING_KEY, context);
+
+    // партнёрский код ?ref=… живёт 30 дней, чтобы заявка не потеряла партнёра
+    const fresh = String(params.get("ref") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
+    if (fresh.length >= 2) store.set(localStorage, REF_KEY, { code: fresh, at: Date.now() });
+    const savedRef = store.get(localStorage, REF_KEY, null);
+    if (savedRef && savedRef.code && Date.now() - savedRef.at < REF_DAYS * 864e5) context.ref = savedRef.code;
     return context;
   })();
 
@@ -433,6 +441,7 @@
       marketing.utm_medium && `UTM medium: ${marketing.utm_medium}`,
       marketing.utm_campaign && `UTM campaign: ${marketing.utm_campaign}`,
       marketing.gclid && `GCLID: ${marketing.gclid}`,
+      marketing.ref && `Партнёр (ref): ${marketing.ref}`,
       marketing.referrer && `Referrer: ${marketing.referrer}`
     ].filter(Boolean);
     if (extra.length) lines.push("", ...extra);
@@ -536,6 +545,7 @@
             contact: { method: customer.method, phone: customer.phone, nick: customer.nick },
             order: {
               id: pendingOrderId,
+              ref: marketing.ref || "",
               customer,
               items: cart.map((i) => ({ kind: i.kind, group: i.group || "", title: i.title, program: i.program, priceLabel: i.priceLabel, date: i.date, adults: i.adults, children: i.children, duration: i.duration, comment: i.comment, url: location.origin + i.url })),
               source: { utm_source: marketing.utm_source || "", utm_medium: marketing.utm_medium || "", utm_campaign: marketing.utm_campaign || "", gclid: marketing.gclid || "", referrer: marketing.referrer || "" }

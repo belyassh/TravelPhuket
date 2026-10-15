@@ -66,24 +66,19 @@ const ICONS = {
 /* ---------- data ---------- */
 
 const GROUPS = {
-  islands: { label: "Острова и море", short: "Острова", emoji: "🏝", href: "/excursions/islands.html", seo: ["Экскурсии на острова Пхукета: Пхи-Пхи, Симиланы, Рача, Сурин", "Морские экскурсии на острова из Пхукета: Пхи-Пхи, Симиланские острова, Рача, Коралл, Сурин, Рок и Ха. Спидбот и катамаран, русский гид, трансфер, заявка онлайн.", "Пхи-Пхи, Симиланы, Рача, Сурин и другие острова: от однодневных поездок до маршрутов с ночёвкой."] },
-  phangnga: { label: "Пханг Нга, Джеймс Бонд и Краби", short: "Пханг Нга и Краби", emoji: "🛶", href: "/excursions/phang-nga-krabi-tours.html", seo: ["Экскурсии в Пханг Нга и Краби: остров Джеймса Бонда, каяки, закат", "Остров Джеймса Бонда, залив Пханг Нга, Краби: каяки, пещеры, сияние планктона и закаты. Групповые и рассветные программы с русским гидом, заявка онлайн.", "Остров Джеймса Бонда, каяки в мангровых лесах, острова Краби и сияние планктона."] },
-  land: { label: "Наземные туры", short: "Наземные", emoji: "🌿", href: "/excursions/land.html", seo: ["Наземные экскурсии на Пхукете: город, джунгли, озеро Чео Лан, слоны", "Наземные туры из Пхукета: сити-тур, озеро Чео Лан, Avatar World, пляж слонов, Пханга. Русский гид, трансфер из отеля, заявка онлайн.", "Сити-тур, озеро Чео Лан, джунгли, слоны и смотровые площадки без морской качки."] },
-  active: { label: "Активный отдых", short: "Активный", emoji: "⚡", href: "/excursions/active.html", seo: ["Активный отдых на Пхукете: самолёт, параплан, квадроциклы, дайвинг", "Полёты на самолёте и параплане, гидроциклы, квадроциклы, рафтинг, дайвинг, рыбалка и Hanuman World. Заявка онлайн, подтверждение менеджером.", "Полёты, гидроциклы, квадроциклы, рафтинг, дайвинг и рыбалка."] },
-  family: { label: "Семья и дети", short: "Семья", emoji: "👨‍👩‍👧", href: "/excursions/family.html", seo: ["Куда сходить с детьми на Пхукете: аквапарк, дельфинарий, парки слонов", "Развлечения для детей и семей на Пхукете: аквапарк Andamanda, дельфинарий, этичные парки слонов, Carnaval Magic, FantaSea, Каолак. Заявка онлайн.", "Аквапарк, дельфинарий, парки слонов и большие семейные шоу."] },
-  show: { label: "Шоу и вечер", short: "Шоу", emoji: "🎭", href: "/excursions/show.html", seo: ["Шоу на Пхукете: Simon Cabaret, Siam Niramit, цирк и тайский бокс", "Вечерние шоу Пхукета: Simon Cabaret, Siam Niramit, Phuket Circus, тайский бокс Bangla. Билеты разных категорий, трансфер, заявка онлайн.", "Кабаре, театр Siam Niramit, цирк и тайский бокс."] },
-  premium: { label: "Premium: яхты и клубы", short: "Premium", emoji: "💎", href: "/excursions/premium.html", seo: ["Аренда яхт и катамаранов на Пхукете, премиум-круизы и пляжные клубы", "Аренда яхт, катеров и катамаранов на Пхукете, премиум-круизы HYPE Yacht, Phi Phi и закат на катамаране, пляжный клуб YONA. Цены и заявка онлайн.", "Приватные яхты и катамараны, премиум-круизы и пляжный клуб на воде."] },
-  trips: { label: "Туры в другие страны", short: "Другие страны", emoji: "✈️", href: "/excursions/trips.html", seo: ["Туры из Пхукета в Сингапур, Малайзию, Бангкок и Камбоджу", "Групповые туры из Пхукета с русским гидом: Сингапур, Куала-Лумпур, Бангкок, Ангкор Ват (Камбоджа). Авиабилеты, отель, экскурсии, заявка онлайн.", "Сингапур, Куала-Лумпур, Бангкок и Ангкор Ват с русским гидом."] },
+  islands: { label: "Море и острова", short: "Море", emoji: "🏝", href: "/excursions/islands.html", seo: ["Морские экскурсии на Пхукете: Пхи-Пхи, Джеймс Бонд, Рача, дайвинг", "Морские экскурсии с Пхукета: Пхи-Пхи и бухта Майя, остров Джеймса Бонда, Рача и Корал, катамараны, дайвинг и рыбалка. Цены для взрослых и детей, заявка онлайн.", "Пхи-Пхи, Джеймс Бонд, Краби, Рача, дайвинг и рыбалка: цены для взрослых и детей в батах."] },
+  land: { label: "Наземные туры", short: "Суша", emoji: "🌿", href: "/excursions/land.html", seo: ["Наземные экскурсии на Пхукете: сити-тур, Чео Лан, слоны, аквапарк", "Наземные туры с Пхукета: обзорная по острову, озеро Чео Лан, Као Лак, слоны, Аватар, рафтинг и зиплайн, аквапарк Andamanda. Цены и заявка онлайн.", "Обзорная экскурсия, Чео Лан, джунгли, слоны, рафтинг и аквапарк."] },
+  show: { label: "Шоу и вечер", short: "Шоу", emoji: "🎭", href: "/excursions/show.html", seo: ["Шоу на Пхукете: Fantasea, Siam Niramit, Carnaval Magic, тайский бокс", "Вечерние шоу Пхукета: Fantasea, Siam Niramit, Carnaval Magic, Simon Cabaret и тайский бокс. Билеты со сборами, цены для взрослых и детей, заявка онлайн.", "Fantasea, Siam Niramit, Carnaval Magic, кабаре и тайский бокс."] },
   visa: { label: "Бордеран и визаран", short: "Бордеран", emoji: "🛂", href: "/services/#visa" },
   rental: { label: "Аренда транспорта", short: "Аренда", emoji: "🛵", href: "/rental/" },
   other: { label: "Услуги", short: "Услуги", emoji: "🚐", href: "/services/#other" }
 };
-const EXCURSION_GROUPS = ["islands", "phangnga", "land", "active", "family", "show", "premium", "trips"];
+const EXCURSION_GROUPS = ["islands", "land", "show"];
 
 const TAG_WORDS = {
   islands: "острова остров", snorkel: "снорклинг", diving: "дайвинг", kayak: "каяки каноэ", dawn: "рассвет", sunset: "закат",
   wildlife: "животные дикая природа", elephants: "слоны слон", dolphins: "дельфины дельфинарий", nature: "природа джунгли водопады озеро", culture: "город храмы культура", adventure: "адреналин экстрим",
-  family: "семья дети", show: "шоу вечер", premium: "премиум vip яхта", multiday: "с ночёвкой несколько дней", abroad: "другая страна",
+  family: "семья дети", show: "шоу вечер", premium: "премиум vip комфорт катамаран", multiday: "с ночёвкой несколько дней", abroad: "другая страна", action: "гидроцикл рафтинг квадроцикл зиплайн",
   fishing: "рыбалка", flight: "полёт небо", relax: "отдых спа", beach: "пляж", bay: "пханг нга джеймс бонд краби", calm: "спокойно", views: "виды панорама"
 };
 
@@ -134,6 +129,9 @@ function normExcursion(raw, index) {
     images: (raw.images || []).filter(Boolean),
     priceFrom: Number(raw.price) || 0,
     priceUnit: raw.priceUnit || "за человека",
+    childPrice: Number(raw.childPrice) || 0,
+    fromPrice: Boolean(raw.fromPrice),
+    schedule: raw.schedule || "",
     duration: raw.duration || "",
     badge: raw.badge || "",
     tags: raw.tags || [],
@@ -249,7 +247,7 @@ function footer() {
     </div>
     <nav class="footer-col" aria-label="Каталог"><h3>Каталог</h3>${catalogLinks}</nav>
     <nav class="footer-col" aria-label="Документы"><h3>Документы</h3><a href="/quiz/">Подбор экскурсии</a><a href="/privacy.html">Политика конфиденциальности</a><a href="/refund-policy.html">Условия возврата</a></nav>
-    <div class="footer-col"><h3>Связь</h3>${links}<a href="${mapLink}" target="_blank" rel="noopener">${esc(address.street || "")}, Патонг</a><p class="muted-light">Рабочие часы: ${esc(site.hours)} (время Пхукета)</p></div>
+    <div class="footer-col"><h3>Связь</h3>${links}<a href="${mapLink}" target="_blank" rel="noopener">${esc(address.street || "")}, Патонг</a><p class="muted-light">Заявки: ${esc(site.hours)}. Офисы: ${esc(site.officeHours)}</p></div>
   </div>
   <div class="container footer-bottom"><p>© ${new Date().getFullYear()} ${esc(site.name)}</p></div>
 </footer>`;
@@ -322,7 +320,7 @@ function card(item, index = 0, initial = Infinity) {
   const search = [item.title, item.overview, GROUPS[item.group].label, ...item.tags.map((t) => TAG_WORDS[t] || t)]
     .join(" ").toLowerCase().replace(/ё/g, "е");
   const price = item.priceFrom
-    ? `<p class="card-price"><small>от</small> ${baht(item.priceFrom)} <small>${esc(item.priceUnit)}</small></p>`
+    ? `<p class="card-price">${item.fromPrice ? "<small>от</small> " : ""}${baht(item.priceFrom)} <small>${esc(item.priceUnit)}</small>${item.childPrice ? `<span class="card-child">дети ${baht(item.childPrice)}</span>` : ""}</p>`
     : `<p class="card-price">Цена по запросу</p>`;
 
   return `<article class="card" data-card data-group="${item.group}" data-search="${esc(search)}"${index >= initial ? " data-extra" : ""}>
@@ -331,7 +329,7 @@ function card(item, index = 0, initial = Infinity) {
     <p class="card-tag">${esc(GROUPS[item.group].label)}</p>
     <h3 class="card-title"><a href="${item.url}">${esc(item.title)}</a></h3>
     <p class="card-text">${esc(item.overview)}</p>
-    <div class="card-foot">${price}${item.duration ? `<span class="card-meta">${ICONS.clock}${esc(item.duration)}</span>` : ""}</div>
+    <div class="card-foot">${price}${item.duration || item.schedule ? `<span class="card-meta">${ICONS.clock}${esc([item.duration, item.schedule].filter(Boolean).join(" · "))}</span>` : ""}</div>
   </div>
 </article>`;
 }
@@ -368,12 +366,12 @@ const itemListSchema = (list, name) => ({
 /* ---------- home ---------- */
 
 const FAQ = [
-  ["Как быстро вы подтверждаете заявку?", `В рабочие часы (${site.hours} по времени Пхукета) обычно в течение 15–30 минут. Заявки, отправленные ночью, мы обрабатываем утром.`],
+  ["Как быстро вы подтверждаете заявку?", `Заявки принимаем ${site.hours}, менеджер отвечает в WhatsApp или Telegram в ближайшее время. Офисы в Патонге и Кате работают ${site.officeHours} по времени Пхукета.`],
   ["Как понять, что заявка принята?", "После отправки вы увидите подтверждение на сайте. Затем менеджер напишет вам в WhatsApp или Telegram, в зависимости от того, что вы выбрали."],
   ["Нужна ли оплата при оформлении заявки?", "Нет. Заявка не является оплатой: менеджер сначала подтвердит наличие мест, детали трансфера и порядок оплаты."],
   ["Можно ли изменить дату после оформления?", "Обычно да, при наличии мест. Напишите менеджеру как можно раньше, чтобы мы закрепили новый слот."],
-  ["В какой валюте указаны цены?", "Цены указаны в тайских батах (฿). У многих программ отдельная цена для детей, она указана в описании программы."],
-  ["Какие экскурсии подходят для отдыха с детьми?", "Семьям чаще подходят аквапарк, дельфинарий, этичные парки слонов и наземные туры. Возраст детей укажите в комментарии или пройдите подбор: он учтёт ограничения."],
+  ["В какой валюте указаны цены?", "Цены указаны в тайских батах (฿), отдельно для взрослых и детей. Окончательную стоимость и порядок оплаты подтверждает менеджер после заявки."],
+  ["Какие экскурсии подходят для отдыха с детьми?", "Семьям чаще подходят аквапарк, шоу Carnaval Magic и Fantasea, Као Лак и наземные туры. Возраст детей укажите в комментарии или пройдите подбор: он учтёт ограничения. На морских турах для беременных действуют ограничения, предупредите менеджера заранее."],
   ["В какие месяцы лучше ехать на экскурсии?", "Наиболее стабильная погода обычно с ноября по апрель. С мая по октябрь туры тоже проходят, но программа может меняться из-за погоды и состояния моря."],
   ["За сколько дней лучше бронировать?", "Рекомендуем за 2–5 дней, а в высокий сезон и на популярные маршруты за 5–7 дней: так больше шансов выбрать удобную дату."]
 ];
@@ -391,7 +389,7 @@ function contactSection() {
       <p class="eyebrow">Как нас найти</p>
       <h2>Заходите в гости или напишите</h2>
       <p class="lead">${esc(address.line || "")}</p>
-      <p class="contact-hours">Рабочие часы: ${esc(site.hours)} (время Пхукета)</p>
+      <p class="contact-hours">Офисы в Патонге и Кате: ежедневно ${esc(site.officeHours)} (время Пхукета). Заявки и сообщения: ${esc(site.hours)}.</p>
       <div class="contact-actions">${buttons}</div>
       <a class="map-link" href="${mapLink}" target="_blank" rel="noopener">${ICONS.pin}<span>Открыть в Google Картах</span></a>
     </div>
@@ -414,7 +412,7 @@ function homePage() {
   const facts = [
     [ICONS.users, "Русскоязычные гиды", "Работаем с проверенными партнёрами на острове"],
     [ICONS.pulse, "Прозрачные цены", "Стоимость в батах, цена для детей в программе"],
-    [ICONS.clock, `Ответ ${site.hours}`, "Подтверждаем заявки вручную, без автоответчиков"],
+    [ICONS.clock, "Заявки 24/7", `Офисы в Патонге и Кате: ${site.officeHours}`],
     [ICONS.pin, "Трансфер из отеля", "Организуем из большинства районов Пхукета"]
   ];
   const quick = [...excursionGroups, "visa", "rental"].filter(hasGroup).slice(0, 6);
@@ -437,7 +435,7 @@ function homePage() {
     <p class="hero-lead">Острова, море и впечатления без хлопот. Выбирайте маршрут, добавляйте в корзину и отправляйте одну заявку: менеджер подтвердит места и напишет вам в WhatsApp или Telegram.</p>
     <form class="hero-search" role="search" data-hero-search>
       ${ICONS.search}
-      <input type="search" name="q" placeholder="Куда хотите? Пхи-Пхи, Симиланы, слоны, дайвинг…" aria-label="Поиск экскурсии" autocomplete="off" />
+      <input type="search" name="q" placeholder="Куда хотите? Пхи-Пхи, Джеймс Бонд, слоны, дайвинг…" aria-label="Поиск экскурсии" autocomplete="off" />
       <button class="btn btn-primary" type="submit">Найти</button>
     </form>
     <div class="hero-quick"><a class="quick-quiz" href="/quiz/">Подобрать за 30 секунд</a>${quick.map((k) => `<a href="${GROUPS[k].href}" data-quick="${k}">${esc(GROUPS[k].short)}</a>`).join("")}</div>
@@ -489,11 +487,11 @@ ${contactSection()}
       url: SITE_URL,
       logo: `${SITE_URL}/logo.webp`,
       image: `${SITE_URL}/og.jpg`,
-      description: "Экскурсии на Пхукете, бордеран, трансферы, аренда яхт и транспорта.",
+      description: "Экскурсии на Пхукете, бордеран, трансферы и аренда транспорта. Офисы в Патонге и Кате.",
       address: { "@type": "PostalAddress", streetAddress: address.street, addressLocality: address.locality, addressRegion: address.region, postalCode: address.postalCode, addressCountry: address.country },
       hasMap: mapLink,
       areaServed: { "@type": "Place", name: "Phuket, Thailand" },
-      openingHours: "Mo-Su 09:00-21:00",
+      openingHours: "Mo-Su 12:00-20:00",
       sameAs: [tgLink, waLink, igLink].filter(Boolean),
       email: contacts.email || undefined
     },
@@ -502,8 +500,8 @@ ${contactSection()}
   ];
 
   return page({
-    title: "Экскурсии на Пхукете: острова, Джеймс Бонд, шоу, яхты | Niko Phuket",
-    description: "Более 50 экскурсий на Пхукете с русским гидом: Пхи-Пхи, Симиланы, Джеймс Бонд, слоны, шоу, яхты, бордеран. Заявка онлайн, ответ в WhatsApp или Telegram.",
+    title: "Экскурсии на Пхукете: острова, Джеймс Бонд, шоу | Niko Phuket",
+    description: "Лучшие экскурсии Пхукета с русским гидом: Пхи-Пхи, Джеймс Бонд, Краби, слоны, шоу, бордеран. Цены для взрослых и детей, заявка онлайн, ответ в WhatsApp или Telegram.",
     path: "/",
     body,
     schema
@@ -535,9 +533,9 @@ function catalogPages() {
   write("excursions/index.html", catalogPage({
     path: "/excursions/",
     h1: "Экскурсии на Пхукете",
-    lead: "Острова, залив Пханг Нга, джунгли, шоу, яхты и туры в другие страны. Выберите маршрут, дату и количество гостей.",
+    lead: "Море, наземные туры и вечерние шоу. Цены для взрослых и детей в батах, выберите маршрут, дату и количество гостей.",
     title: "Экскурсии на Пхукете: цены, программы, заявка онлайн | Niko Phuket",
-    description: "Все экскурсии на Пхукете в одном каталоге: Пхи-Пхи, Симиланы, Джеймс Бонд, слоны, шоу, яхты, туры в Сингапур и Камбоджу. Цены в батах, заявка онлайн.",
+    description: "Все основные экскурсии на Пхукете в одном каталоге: Пхи-Пхи, Джеймс Бонд, Краби, слоны, шоу. Цены в батах для взрослых и детей, заявка онлайн.",
     list: excursions,
     chips,
     activeKey: "all",
@@ -667,8 +665,8 @@ function bookingCard(item) {
     : "";
   const priceLine = options.length && options[0].label
     ? options[0].label
-    : item.priceFrom ? `${baht(item.priceFrom)} ${item.priceUnit}` : "По запросу";
-  const lead = options.length && options[0].label ? "Стоимость" : item.priceFrom ? "от" : "Цена";
+    : item.priceFrom ? `${baht(item.priceFrom)}${item.childPrice ? ` взр. · ${baht(item.childPrice)} дет.` : ` ${item.priceUnit}`}` : "По запросу";
+  const lead = options.length && options[0].label ? "Стоимость" : item.priceFrom ? (item.fromPrice ? "от" : "Цена") : "Цена";
   const backHref = { excursion: "/excursions/", rental: "/rental/", service: "/services/" }[item.kind];
 
   return `<aside class="booking" id="book" data-booking-wrap>
@@ -678,7 +676,7 @@ function bookingCard(item) {
     <form class="booking-form" data-booking novalidate data-kind="${item.kind}" data-id="${esc(item.id)}" data-title="${esc(item.title)}" data-url="${item.url}" data-image="${esc(image(item))}" data-price="${esc(priceLine)}" data-group="${esc(GROUPS[item.group].label)}">
       <div class="form-grid">${select}${bookingFields(item)}</div>
       <button class="btn btn-primary btn-block" type="submit">Добавить в корзину</button>
-      <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места в рабочие часы ${esc(site.hours)}.</p>
+      <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места и порядок оплаты в WhatsApp или Telegram.</p>
     </form>
   </div>
   <div class="booking-done" data-booking-done hidden>
@@ -701,6 +699,7 @@ function detailPage(item) {
 
   const gallery = item.images.slice(0, 3);
   const facts = [];
+  if (item.schedule) facts.push([ICONS.clock, "Выезды", item.schedule]);
   if (item.duration) facts.push([ICONS.clock, "Длительность", item.duration]);
   if (r.groupSize) facts.push([ICONS.users, "Группа", r.groupSize]);
   if (r.difficulty) facts.push([ICONS.pulse, "Нагрузка", r.difficulty]);
@@ -752,7 +751,7 @@ function detailPage(item) {
     ${bookingCard(item)}
   </div>
 </div>
-<div class="mobile-bar"><p>${item.priceFrom ? `<small>от</small> <strong>${baht(item.priceFrom)}</strong>` : ""}</p><a class="btn btn-primary" href="#book">Выбрать дату</a></div>`;
+<div class="mobile-bar"><p>${item.priceFrom ? `<small>${item.fromPrice ? "от" : "взр."}</small> <strong>${baht(item.priceFrom)}</strong>${item.childPrice ? ` <small>дет. ${baht(item.childPrice)}</small>` : ""}` : ""}</p><a class="btn btn-primary" href="#book">Выбрать дату</a></div>`;
 
   const provider = { "@type": "TravelAgency", name: site.name, url: SITE_URL };
   const offers = item.options.length && r.programs?.length
@@ -761,11 +760,11 @@ function detailPage(item) {
   const imgs = gallery.map((g) => (g.startsWith("http") ? g : SITE_URL + g));
   const main = item.kind === "rental"
     ? { "@type": "Product", name: item.title, description: item.overview || desc[0], image: imgs, brand: { "@type": "Organization", name: site.name }, offers: { ...offers, availability: "https://schema.org/InStock" } }
-    : item.kind === "service" || item.group === "premium"
+    : item.kind === "service"
       ? { "@type": "Service", name: item.title, description: item.overview || desc[0], image: imgs, provider, areaServed: { "@type": "Place", name: "Phuket, Thailand" }, offers }
       : { "@type": "TouristTrip", name: item.title, description: item.overview || desc[0], image: imgs, touristType: "Туристы на Пхукете", provider, offers };
 
-  const priceNote = item.priceFrom ? ` От ${baht(item.priceFrom)} ${item.priceUnit}.` : "";
+  const priceNote = item.priceFrom ? ` ${item.fromPrice ? "От " : "Цена: "}${baht(item.priceFrom)} ${item.priceUnit}${item.childPrice ? `, дети ${baht(item.childPrice)}` : ""}.` : "";
   return page({
     title: `${item.title}: цена и заявка | ${site.name}`,
     description: `${item.overview || desc[0] || ""}${priceNote} Заявка онлайн, подтверждение менеджером.`.replace(/\s+/g, " ").trim().slice(0, 300),
@@ -806,7 +805,7 @@ function cartPage() {
       <input class="trap" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <button class="btn btn-primary btn-block" type="submit" data-submit>Отправить заявку</button>
       <p class="form-note" data-note role="status" aria-live="polite"></p>
-      <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места и детали, рабочие часы ${esc(site.hours)}.</p>
+      <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места и порядок оплаты в WhatsApp или Telegram.</p>
     </form>
   </div>
 </section>
@@ -814,7 +813,7 @@ function cartPage() {
   <div class="modal-card">
     <span class="done-icon">${ICONS.check}</span>
     <h2 id="doneTitle">Заявка отправлена</h2>
-    <p>Менеджер свяжется с вами в ближайшие рабочие часы (${esc(site.hours)}) в <strong data-done-method>WhatsApp</strong>.</p>
+    <p>Менеджер свяжется с вами в ближайшее время в <strong data-done-method>WhatsApp</strong>.</p>
     <a class="btn btn-primary btn-block" href="/excursions/" data-back-to-catalog>Вернуться к экскурсиям</a>
   </div>
 </dialog>`;

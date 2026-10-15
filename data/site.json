@@ -1,14 +1,15 @@
 {
   "name": "Niko Phuket",
   "url": "https://nikophuket.com",
-  "tagline": "Экскурсии и жизнь на Пхукете",
+  "tagline": "Экскурсии на Пхукете",
   "currency": "THB",
-  "hours": "09:00–21:00",
+  "hours": "круглосуточно",
   "contacts": {
     "telegram": "hitachi315",
-    "whatsapp": "",
+    "whatsapp": "66818310831",
     "email": "hello@nikophuket.com",
-    "instagram": "https://www.instagram.com/nikolai_phuket/"
+    "instagram": "https://www.instagram.com/nikolai_phuket/",
+    "phone": "+66 81 831 0831"
   },
   "orders": {
     "endpoint": ""
@@ -23,8 +24,43 @@
     "country": "TH"
   },
   "redirects": {
+    "/excursions/plane-flights-phuket.html": "/excursions/land.html",
+    "/excursions/paragliding-phuket.html": "/excursions/land.html",
+    "/excursions/similan-islands.html": "/excursions/islands.html",
+    "/excursions/similan-premium-catamaran.html": "/excursions/islands.html",
+    "/excursions/surin-islands.html": "/excursions/islands.html",
+    "/excursions/rok-ha-islands.html": "/excursions/islands.html",
+    "/excursions/four-pearls-andaman.html": "/excursions/islands.html",
+    "/excursions/five-pearls-andaman.html": "/excursions/islands.html",
+    "/excursions/racha-coral-dawn-fishing.html": "/excursions/islands.html",
+    "/excursions/racha-coral-maiton.html": "/excursions/islands.html",
+    "/excursions/plankton-glow-phang-nga.html": "/excursions/islands.html",
+    "/excursions/phang-nga-krabi.html": "/excursions/islands.html",
+    "/excursions/krabi-secrets.html": "/excursions/islands.html",
+    "/excursions/avatar-world.html": "/excursions/land.html",
+    "/excursions/elephant-beach-mantra-spa.html": "/excursions/land.html",
+    "/excursions/similan-2-days-diving.html": "/excursions/land.html",
+    "/excursions/atv-phuket.html": "/excursions/land.html",
+    "/excursions/lake-fishing-phuket.html": "/excursions/land.html",
+    "/excursions/dolphinarium-phuket.html": "/excursions/land.html",
+    "/excursions/elephant-parks-ethical.html": "/excursions/land.html",
+    "/excursions/circus-show-phuket.html": "/excursions/show.html",
+    "/excursions/yacht-boat-rental.html": "/excursions/",
+    "/excursions/catamaran-rental.html": "/excursions/",
+    "/excursions/hype-yacht.html": "/excursions/",
+    "/excursions/yona-beach-club.html": "/excursions/",
+    "/excursions/singapore-2-days.html": "/excursions/",
+    "/excursions/kuala-lumpur-2-days.html": "/excursions/",
+    "/excursions/kuala-lumpur-singapore-3-days.html": "/excursions/",
+    "/excursions/bangkok-1-day.html": "/excursions/",
+    "/excursions/angkor-cambodia-2-days.html": "/excursions/",
+    "/excursions/phang-nga-krabi-tours.html": "/excursions/islands.html",
+    "/excursions/active.html": "/excursions/land.html",
+    "/excursions/family.html": "/excursions/land.html",
+    "/excursions/premium.html": "/excursions/",
+    "/excursions/trips.html": "/excursions/",
     "/excursions/phi-phi-speedboat.html": "/excursions/phi-phi-maya-bay-snorkeling.html",
-    "/rental/catamaran-sunset-cruise.html": "/excursions/catamaran-rental.html"
+    "/rental/catamaran-sunset-cruise.html": "/excursions/phi-phi-racha-yai-sunset-party.html"
   },
   "hero": {
     "images": [
@@ -32,5 +68,6 @@
       "/img/hero-2.jpg",
       "/img/hero-4.jpg"
     ]
-  }
+  },
+  "officeHours": "12:00–20:00"
 }

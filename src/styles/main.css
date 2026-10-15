@@ -594,3 +594,6 @@ input:user-invalid, select:user-invalid { border-color: var(--coral); }
 #contacts { padding-top: clamp(40px, 6vw, 72px); }
 
 @media (prefers-reduced-motion: reduce) { .hero-slides img { animation: none !important; opacity: 0; } .hero-slides img:first-child { opacity: 1; } }
+
+/* цена для детей на карточке */
+.card-child { display: block; margin-top: 2px; font-weight: 600; font-size: 0.8rem; color: var(--ink-soft); }

@@ -9,6 +9,7 @@
 
 const SHEET_ORDERS = "Заявки";
 const SHEET_ITEMS = "Позиции";
+const SHEET_PARTNERS = "Партнёры";
 const TIMEZONE = "Asia/Bangkok";
 
 // порядок и цвета статусов
@@ -22,7 +23,7 @@ const STATUSES = [
 
 const ORDER_HEADERS = [
   "Дата (Пхукет)", "№ заявки", "Статус", "Имя", "Телефон", "Связь", "Ник Telegram", "Отель",
-  "Позиции", "Кол-во", "Ближайшая дата", "Комментарий клиента", "Источник", "Заметки менеджера"
+  "Позиции", "Кол-во", "Ближайшая дата", "Комментарий клиента", "Источник", "Заметки менеджера", "Партнёр (ref)", "Людей"
 ];
 const ITEM_HEADERS = [
   "Дата (Пхукет)", "№ заявки", "Тип", "Категория", "Название", "Программа", "Дата поездки",
@@ -59,10 +60,12 @@ function setup() {
   orders.getRange(2, 5, orders.getMaxRows() - 1, 1).setNumberFormat("@"); // телефон как текст
   orders.getRange(2, 9, orders.getMaxRows() - 1, 1).setWrap(true).setVerticalAlignment("top");
   orders.getRange(2, 1, orders.getMaxRows() - 1, ORDER_HEADERS.length).setVerticalAlignment("top");
-  [150, 110, 110, 160, 140, 100, 130, 160, 380, 70, 120, 260, 200, 260].forEach((w, i) => orders.setColumnWidth(i + 1, w));
+  [150, 110, 110, 160, 140, 100, 130, 160, 380, 70, 120, 260, 200, 260, 120, 70].forEach((w, i) => orders.setColumnWidth(i + 1, w));
   [150, 110, 110, 160, 280, 220, 110, 80, 80, 100, 160, 240, 300].forEach((w, i) => items.setColumnWidth(i + 1, w));
 
-  SpreadsheetApp.getUi().alert("Готово. Листы «Заявки» и «Позиции» настроены.\nДальше: Развернуть → Новое развёртывание → Веб-приложение (см. sheets/README.md).");
+  setupPartners_(ss);
+
+  SpreadsheetApp.getUi().alert("Готово. Листы «Заявки», «Позиции» и «Партнёры» настроены.\nДальше: Развернуть → Новое развёртывание → Веб-приложение (см. sheets/README.md).");
 }
 
 /** Меню «Niko» в таблице: быстрые кнопки статусов для выбранных строк. */
@@ -118,6 +121,7 @@ function doPost(e) {
       const source = order.source || {};
       const sourceText = Object.keys(source).filter((k) => source[k]).map((k) => k + ": " + source[k]).join("\n");
 
+      const people = list.reduce((sum, i) => sum + (Number(i.adults) || 0) + (Number(i.children) || 0), 0);
       const summary = list.map((i, n) => {
         const people = i.adults || i.children ? " · взр " + i.adults + ", дет " + i.children : "";
         const date = i.date ? " · " + i.date : "";
@@ -127,7 +131,7 @@ function doPost(e) {
       orders.appendRow([
         now, order.id, "request", customer.name || "", customer.phone || "",
         customer.method === "telegram" ? "Telegram" : "WhatsApp", customer.nick || "", customer.hotel || "",
-        summary, list.length, dates[0] || "", customer.comment || "", sourceText, ""
+        summary, list.length, dates[0] || "", customer.comment || "", sourceText, "", order.ref || "", people
       ]);
       const newRow = orders.getLastRow();
       orders.getRange(newRow, 5).setNumberFormat("@").setValue(customer.phone || "");
@@ -165,4 +169,31 @@ function writeHeader_(sheet, headers) {
   sheet.getRange(1, 1, 1, headers.length).setValues([headers])
     .setFontWeight("bold").setBackground("#0f2a33").setFontColor("#ffffff").setVerticalAlignment("middle");
   sheet.setFrozenRows(1);
+}
+
+/**
+ * Лист «Партнёры»: код партнёра = то, что стоит после ?ref= в его ссылке.
+ * Выплата считается только за людей из заявок со статусом «complete».
+ */
+function setupPartners_(ss) {
+  const sheet = getOrCreateSheet_(ss, SHEET_PARTNERS);
+  const headers = ["Код (ref)", "Имя", "Контакт", "Ставка, ฿ за человека", "Заявок", "Людей всего", "Людей complete", "К выплате, ฿", "Выплачено, ฿", "Остаток, ฿"];
+  writeHeader_(sheet, headers);
+  const rows = 200;
+  const o = "'" + SHEET_ORDERS + "'!";
+  const formulas = [];
+  for (let r = 2; r <= rows + 1; r++) {
+    formulas.push([
+      '=IF($A' + r + '="","",COUNTIF(' + o + '$O:$O,$A' + r + '))',
+      '=IF($A' + r + '="","",SUMIF(' + o + '$O:$O,$A' + r + ',' + o + '$P:$P))',
+      '=IF($A' + r + '="","",SUMIFS(' + o + '$P:$P,' + o + '$O:$O,$A' + r + ',' + o + '$C:$C,"complete"))',
+      '=IF($A' + r + '="","",G' + r + '*D' + r + ')',
+    ]);
+  }
+  sheet.getRange(2, 5, rows, 4).setFormulas(formulas);
+  sheet.getRange(2, 10, rows, 1).setFormulas(Array.from({ length: rows }, (_, i) => ['=IF($A' + (i + 2) + '="","",H' + (i + 2) + "-N(I" + (i + 2) + "))"]));
+  if (sheet.getRange("A2").isBlank()) {
+    sheet.getRange("A2:D2").setValues([["example", "Пример партнёра", "@telegram", 100]]);
+  }
+  [120, 180, 160, 150, 80, 100, 120, 120, 120, 110].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
 }

@@ -121,6 +121,7 @@ async function sendToSheet(env, order) {
     const customer = order.customer || {};
     const safe = {
       id: cut(order.id, 40),
+      ref: cut(String(order.ref || "").toLowerCase().replace(/[^a-z0-9_-]/g, ""), 32),
       customer: {
         name: cut(customer.name, 120),
         phone: cut(customer.phone, 40),
