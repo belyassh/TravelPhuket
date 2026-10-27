@@ -552,7 +552,10 @@
             }
           })
         });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+          const detail = await response.json().catch(() => ({}));
+          throw new Error(`HTTP ${response.status}${detail.error ? " " + detail.error : ""}`);
+        }
 
         track("generate_lead", { lead_type: "cart_order", send_method: "bot", contact_method: method, items_count: cart.length });
         cart = [];
@@ -564,6 +567,7 @@
       } catch (error) {
         console.error("Отправка заявки не удалась", error);
         showFailure(note);
+        note.append(el("small", "error-code", ` (код: ${String(error && error.message || error).slice(0, 80)})`));
       } finally {
         sending = false;
         submit.disabled = false;
