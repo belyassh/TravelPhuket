@@ -12,7 +12,7 @@
     "phone": "+66 81 831 0831"
   },
   "orders": {
-    "endpoint": ""
+    "endpoint": "https://nikoorders.nikitahill099.workers.dev"
   },
   "analyticsId": "G-VRKTR3SHH0",
   "address": {
