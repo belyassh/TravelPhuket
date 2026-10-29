@@ -280,7 +280,7 @@ function footer() {
   <div class="container footer-grid">
     <div class="footer-brand">
       <img src="/logo.webp" alt="${esc(site.name)}" width="96" height="96" loading="lazy" />
-      <p>${esc(site.tagline)}. Подтверждаем заявки вручную, пишем в WhatsApp или Telegram.</p>
+      <p>${esc(site.tagline)} без суеты. Каждую заявку подтверждаем вручную и пишем вам в WhatsApp или Telegram.</p>
     </div>
     <nav class="footer-col" aria-label="Каталог"><h3>Каталог</h3>${catalogLinks}</nav>
     <nav class="footer-col" aria-label="Документы"><h3>Документы</h3><a href="/quiz/">Подбор экскурсии</a><a href="/privacy.html">Политика конфиденциальности</a><a href="/refund-policy.html">Условия возврата</a></nav>
@@ -405,14 +405,14 @@ const itemListSchema = (list, name) => ({
 /* ---------- home ---------- */
 
 const FAQ = [
-  ["Как быстро вы подтверждаете заявку?", `Заявки принимаем ${site.hours}, менеджер отвечает в WhatsApp или Telegram в ближайшее время. Офисы в Патонге и Кате работают ${site.officeHours} по времени Пхукета.`],
-  ["Как понять, что заявка принята?", "После отправки вы увидите подтверждение на сайте. Затем менеджер напишет вам в WhatsApp или Telegram, в зависимости от того, что вы выбрали."],
-  ["Нужна ли оплата при оформлении заявки?", "Нет. Заявка не является оплатой: менеджер сначала подтвердит наличие мест, детали трансфера и порядок оплаты."],
-  ["Можно ли изменить дату после оформления?", "Обычно да, при наличии мест. Напишите менеджеру как можно раньше, чтобы мы закрепили новый слот."],
-  ["В какой валюте указаны цены?", "Цены указаны в тайских батах (฿), отдельно для взрослых и детей. Окончательную стоимость и порядок оплаты подтверждает менеджер после заявки."],
-  ["Какие экскурсии подходят для отдыха с детьми?", "Семьям чаще подходят аквапарк, шоу Carnaval Magic и Fantasea, Као Лак и наземные туры. Возраст детей укажите в комментарии или пройдите подбор: он учтёт ограничения. На морских турах для беременных действуют ограничения, предупредите менеджера заранее."],
-  ["В какие месяцы лучше ехать на экскурсии?", "Наиболее стабильная погода обычно с ноября по апрель. С мая по октябрь туры тоже проходят, но программа может меняться из-за погоды и состояния моря."],
-  ["За сколько дней лучше бронировать?", "Рекомендуем за 2–5 дней, а в высокий сезон и на популярные маршруты за 5–7 дней: так больше шансов выбрать удобную дату."]
+  ["Как быстро вы отвечаете?", `Заявки принимаем круглосуточно, а пишем вам в WhatsApp или Telegram в ближайшее время. Офисы в Патонге и Кате открыты ${site.officeHours} по времени Пхукета.`],
+  ["Как понять, что заявка дошла?", "После отправки на сайте появится подтверждение, а следом вам напишет менеджер в WhatsApp или Telegram, в зависимости от того, что вы выбрали."],
+  ["Нужно ли платить сразу?", "Нет, заявка не оплата. Сначала мы подтверждаем места, трансфер и цену, а потом договариваемся, как вам удобнее заплатить."],
+  ["Можно ли перенести дату?", "Обычно можно, если есть места. Напишите нам как можно раньше, и мы подберём другой день."],
+  ["В какой валюте цены?", "В тайских батах (฿), отдельно для взрослых и детей. Окончательную сумму и способ оплаты подтвердит менеджер после заявки."],
+  ["Куда поехать с детьми?", "Семьям чаще всего нравятся аквапарк, шоу Carnaval Magic и Fantasea, Као Лак и наземные туры. Напишите возраст детей в комментарии или пройдите подбор: он сам учтёт ограничения. На морских турах для беременных действуют ограничения, поэтому предупредите нас заранее."],
+  ["Когда лучше ехать?", "Самая спокойная погода обычно с ноября по апрель. С мая по октябрь экскурсии тоже идут, но программа может поменяться из-за погоды и состояния моря."],
+  ["За сколько дней бронировать?", "Лучше за 2–5 дней, а в высокий сезон и на самые популярные маршруты за 5–7: так больше шансов выбрать удобную дату."]
 ];
 
 function contactSection() {
@@ -444,15 +444,15 @@ function instagramStrip() {
 
 function homePage() {
   const steps = [
-    ["Выберите", "Откройте экскурсию, прочитайте программу и выберите дату и количество гостей."],
-    ["Добавьте в корзину", "Можно собрать несколько экскурсий и отправить одной заявкой."],
-    ["Менеджер напишет вам", "Подтвердим места и детали в WhatsApp или Telegram, как вам удобнее."]
+    ["Выберите поездку", "Откройте экскурсию, посмотрите программу, укажите дату и сколько вас едет."],
+    ["Положите в корзину", "Хотите несколько экскурсий? Соберите их в одну заявку."],
+    ["Мы напишем вам", "Подтвердим места, уточним трансфер и расскажем, как оплатить. В WhatsApp или Telegram, как вам удобнее."]
   ];
   const facts = [
     [ICONS.users, "Русскоязычные гиды", "Работаем с проверенными партнёрами на острове"],
-    [ICONS.pulse, "Прозрачные цены", "Стоимость в батах, цена для детей в программе"],
-    [ICONS.clock, "Заявки 24/7", `Офисы в Патонге и Кате: ${site.officeHours}`],
-    [ICONS.pin, "Трансфер из отеля", "Организуем из большинства районов Пхукета"]
+    [ICONS.pulse, "Честные цены", "Цены в батах, для детей дешевле. Итог и оплату подтверждаем до поездки"],
+    [ICONS.clock, "Отвечаем в любое время", `А ещё ждём вас в офисах в Патонге и Кате: ${site.officeHours}`],
+    [ICONS.pin, "Заберём из отеля", "Организуем трансфер из большинства районов Пхукета"]
   ];
   const quick = [...excursionGroups, "visa", "rental"].filter(hasGroup).slice(0, 6);
 
@@ -471,7 +471,7 @@ function homePage() {
   <div class="container hero-inner">
     <p class="eyebrow">Пхукет · Таиланд</p>
     <h1>Экскурсии на Пхукете</h1>
-    <p class="hero-lead">Острова, море и впечатления без хлопот. Выбирайте маршрут, добавляйте в корзину и отправляйте одну заявку: менеджер подтвердит места и напишет вам в WhatsApp или Telegram.</p>
+    <p class="hero-lead">Пхи-Пхи, остров Джеймса Бонда, слоны, шоу: только то, что действительно стоит вашего отпускного дня. Соберите экскурсии в корзину, оставьте контакт, и мы сами напишем вам в WhatsApp или Telegram.</p>
     <form class="hero-search" role="search" data-hero-search>
       ${ICONS.search}
       <input type="search" name="q" placeholder="Куда хотите? Пхи-Пхи, Джеймс Бонд, слоны, дайвинг…" aria-label="Поиск экскурсии" autocomplete="off" />
@@ -483,7 +483,7 @@ function homePage() {
 
 <section class="section" id="catalog">
   <div class="container">
-    <div class="section-head"><p class="eyebrow">Каталог</p><h2>Что хотите сделать на острове?</h2></div>
+    <div class="section-head"><p class="eyebrow">Каталог</p><h2>Куда поедем?</h2></div>
     ${catalog({ list: items, chips: groupChips([...excursionGroups, "visa", "rental", "other"].filter(hasGroup), "/", (k) => GROUPS[k].href), activeKey: "all", scope: "all" })}
   </div>
 </section>
@@ -491,15 +491,15 @@ function homePage() {
 <section class="section section-flush">
   <div class="container">
     <div class="quiz-banner">
-      <div><p class="eyebrow">Подбор за 30 секунд</p><h2>Не знаете, что выбрать?</h2><p>Ответьте на 2–4 вопроса, и мы подскажем подходящие программы с учётом того, кто едет, и того, что вам хочется.</p></div>
-      <a class="btn btn-primary" href="/quiz/">Подобрать экскурсию</a>
+      <div><p class="eyebrow">Подбор за 30 секунд</p><h2>Глаза разбегаются?</h2><p>Расскажите, кто едет и чего хочется: покажем поездки, которые подойдут именно вам. Без анкет и регистрации.</p></div>
+      <a class="btn btn-primary" href="/quiz/">Помогите выбрать</a>
     </div>
   </div>
 </section>
 
 <section class="section section-tint" id="how">
   <div class="container">
-    <div class="section-head"><p class="eyebrow">Как это работает</p><h2>Три шага до подтверждённой поездки</h2></div>
+    <div class="section-head"><p class="eyebrow">Как это работает</p><h2>Всё очень просто</h2></div>
     <ol class="steps">${steps.map(([t, d], i) => `<li><span class="step-n">${i + 1}</span><h3>${t}</h3><p>${d}</p></li>`).join("")}</ol>
   </div>
 </section>
@@ -715,7 +715,7 @@ function bookingCard(item) {
     <form class="booking-form" data-booking novalidate data-kind="${item.kind}" data-id="${esc(item.id)}" data-title="${esc(item.title)}" data-title-l="${esc(item.title)}" data-url="${item.url}" data-image="${esc(image(item))}" data-price="${esc(priceLine)}" data-price-l="${esc(priceLine)}" data-group="${esc(GROUPS[item.group].label)}">
       <div class="form-grid">${select}${bookingFields(item)}</div>
       <button class="btn btn-primary btn-block" type="submit">Добавить в корзину</button>
-      <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места и порядок оплаты в WhatsApp или Telegram.</p>
+      <p class="booking-note">Это заявка, а не оплата. Мы подтвердим места и подскажем, как оплатить, в WhatsApp или Telegram.</p>
     </form>
   </div>
   <div class="booking-done" data-booking-done hidden>
@@ -818,7 +818,7 @@ function detailPage(item) {
 /* ---------- cart, static pages ---------- */
 
 function cartPage() {
-  const body = `<section class="page-head"><div class="container"><h1>Корзина</h1><p class="lead" data-cart-lead>Проверьте выбранное и оставьте контакты. Менеджер напишет вам в удобный мессенджер.</p></div></section>
+  const body = `<section class="page-head"><div class="container"><h1>Корзина</h1><p class="lead" data-cart-lead>Проверьте, всё ли на месте, и оставьте контакты: мы напишем вам в удобный мессенджер.</p></div></section>
 <section class="section section-flush">
   <div class="container cart-layout" data-cart-root>
     <div class="cart-empty" data-cart-empty hidden>
@@ -845,15 +845,15 @@ function cartPage() {
       <input class="trap" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <button class="btn btn-primary btn-block" type="submit" data-submit>Отправить заявку</button>
       <p class="form-note" data-note role="status" aria-live="polite"></p>
-      <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места и порядок оплаты в WhatsApp или Telegram.</p>
+      <p class="booking-note">Это заявка, а не оплата. Мы подтвердим места и подскажем, как оплатить, в WhatsApp или Telegram.</p>
     </form>
   </div>
 </section>
 <dialog class="modal" data-done-dialog aria-labelledby="doneTitle">
   <div class="modal-card">
     <span class="done-icon">${ICONS.check}</span>
-    <h2 id="doneTitle">Заявка отправлена</h2>
-    <p>Менеджер свяжется с вами в ближайшее время в <strong data-done-method>WhatsApp</strong>.</p>
+    <h2 id="doneTitle">Готово, заявка у нас!</h2>
+    <p>Спасибо! Менеджер напишет вам в ближайшее время в <strong data-done-method>WhatsApp</strong>.</p>
     <a class="btn btn-primary btn-block" href="/excursions/" data-back-to-catalog>Вернуться к экскурсиям</a>
   </div>
 </dialog>`;
@@ -898,7 +898,7 @@ function quizPage() {
     tgLink ? `<a class="btn btn-ghost" href="${tgLink}" target="_blank" rel="noopener">${ICONS.tg}Telegram</a>` : ""
   ].join("");
 
-  const body = `<section class="page-head"><div class="container narrow">${breadcrumbs([{ name: "Главная", href: "/" }, { name: "Подбор экскурсии" }])}<h1>Подбор экскурсии</h1><p class="lead">Ответьте на несколько вопросов: покажем программы, которые подходят именно вам.</p></div></section>
+  const body = `<section class="page-head"><div class="container narrow">${breadcrumbs([{ name: "Главная", href: "/" }, { name: "Подбор экскурсии" }])}<h1>Подбор экскурсии</h1><p class="lead">Ответьте на пару вопросов, и мы покажем поездки, которые подойдут именно вам.</p></div></section>
 <section class="section section-flush">
   <div class="container narrow quiz" data-quiz>
     <div class="quiz-card" data-quiz-stage>
