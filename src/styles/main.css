@@ -597,3 +597,29 @@ input:user-invalid, select:user-invalid { border-color: var(--coral); }
 
 /* цена для детей на карточке */
 .card-child { display: block; margin-top: 2px; font-weight: 600; font-size: 0.8rem; color: var(--ink-soft); }
+
+/* ---------- переключатель языка ---------- */
+.lang-drop { position: relative; }
+.lang-btn { display: inline-flex; align-items: center; gap: 6px; height: 42px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--white); font: inherit; font-weight: 700; font-size: 0.88rem; color: var(--ink); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.lang-btn:hover, .lang-drop.is-open .lang-btn { border-color: var(--ink); }
+.lang-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.lang-btn svg:last-child { width: 14px; height: 14px; transition: transform 0.2s; }
+.lang-drop.is-open .lang-btn svg:last-child { transform: rotate(180deg); }
+.lang-panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 70; display: none; min-width: 180px; padding: 8px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.lang-drop.is-open .lang-panel { display: grid; }
+.main-nav .lang-panel a, .lang-panel a { display: block; padding: 10px 14px; border-radius: var(--radius-sm); border: 0; font-weight: 600; font-size: 0.95rem; text-decoration: none; color: var(--ink); background: transparent; }
+.lang-panel a:hover { background: var(--sand); }
+.lang-panel a[aria-current="true"] { background: var(--sand); color: var(--sea); }
+.lang-menu { display: none; }
+.lang-note { margin-top: 14px; padding: 10px 14px; border-left: 3px solid var(--coral); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--sand); font-size: 0.92rem; color: var(--ink-soft); max-width: 62ch; }
+@media (max-width: 560px) {
+  .lang-bar { display: none; }
+  .lang-menu { display: block; margin-top: 12px; }
+  .main-nav .lang-menu .lang-btn { width: 100%; justify-content: space-between; height: 52px; font-size: 1.05rem; }
+  .main-nav .lang-menu .lang-panel { position: static; margin-top: 8px; box-shadow: none; }
+  .main-nav .lang-panel a { font-size: 1.05rem; padding: 14px 16px; border-bottom: 0; }
+}
+:lang(zh) body, :lang(zh) .btn, :lang(zh) input, :lang(zh) textarea, :lang(zh) select { font-family: var(--font), "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+:lang(zh) h1, :lang(zh) h2, :lang(zh) h3, :lang(zh) .brand-name { font-family: var(--font-display), "PingFang SC", "Microsoft YaHei", "Noto Serif SC", serif; }
+:lang(hi) body, :lang(hi) .btn, :lang(hi) input, :lang(hi) textarea, :lang(hi) select { font-family: var(--font), "Nirmala UI", "Noto Sans Devanagari", sans-serif; }
+:lang(hi) h1, :lang(hi) h2, :lang(hi) h3 { font-family: var(--font-display), "Nirmala UI", "Noto Serif Devanagari", serif; line-height: 1.25; }

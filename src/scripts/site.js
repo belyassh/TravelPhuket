@@ -110,6 +110,19 @@
     }
   });
 
+  /* ---------- язык: переводы строк клиентского кода и ссылки с префиксом /en/, /kk/… ---------- */
+
+  const LANG = config.lang || "ru";
+  const dictionary = (() => {
+    try {
+      return JSON.parse($("#niko-i18n").textContent);
+    } catch {
+      return {};
+    }
+  })();
+  const t = (text, ...args) => String(dictionary[text] ?? text).replace(/\{(\d+)\}/g, (_, n) => (args[n] === undefined ? "" : args[n]));
+  const L = (url) => (LANG === "ru" || !url || url[0] !== "/" || /^\/(assets|img)\//.test(url) || /\.(jpe?g|png|webp|svg)$/i.test(url) ? url : `/${LANG}${url}`);
+
   /* ---------- шапка ---------- */
 
   const header = $("[data-header]");
@@ -126,21 +139,25 @@
     });
   }
 
-  const drop = $("[data-drop]");
-  if (drop) {
+  const drops = $$("[data-drop]");
+  drops.forEach((drop) => {
     const dropBtn = $("[data-drop-btn]", drop);
     const setDrop = (open) => {
       drop.classList.toggle("is-open", open);
       dropBtn.setAttribute("aria-expanded", String(open));
     };
-    dropBtn.addEventListener("click", () => setDrop(!drop.classList.contains("is-open")));
+    dropBtn.addEventListener("click", () => {
+      const open = !drop.classList.contains("is-open");
+      drops.forEach((other) => other !== drop && other.classList.remove("is-open"));
+      setDrop(open);
+    });
     document.addEventListener("click", (event) => {
       if (!drop.contains(event.target)) setDrop(false);
     });
     window.addEventListener("keydown", (event) => {
       if (event.key === "Escape") setDrop(false);
     });
-  }
+  });
 
   const onScroll = () => header && header.classList.toggle("is-scrolled", window.scrollY > 8);
   window.addEventListener("scroll", onScroll, { passive: true });
@@ -213,7 +230,7 @@
 
       if (moreBtn) {
         moreBtn.parentElement.hidden = hiddenByLimit === 0;
-        moreBtn.textContent = `Показать ещё ${Math.min(step, hiddenByLimit)}`;
+        moreBtn.textContent = t("Показать ещё {0}", Math.min(step, hiddenByLimit));
       }
       if (empty) empty.hidden = matched > 0;
 
@@ -294,7 +311,7 @@
     if (program) {
       program.addEventListener("change", () => {
         const option = program.selectedOptions[0];
-        if (option && priceOut) priceOut.textContent = option.dataset.price || "";
+        if (option && priceOut) priceOut.textContent = option.dataset.priceL || option.dataset.price || "";
       });
     }
 
@@ -305,7 +322,7 @@
         return;
       }
       if (cart.length >= MAX_ITEMS) {
-        alert(`В корзине уже ${MAX_ITEMS} позиций. Отправьте заявку, потом добавляйте новые.`);
+        alert(t("В корзине уже {0} позиций. Отправьте заявку, потом добавляйте новые.", MAX_ITEMS));
         return;
       }
 
@@ -323,6 +340,10 @@
         program: option ? option.value : "",
         departure: option ? option.dataset.departure || "" : "",
         priceLabel: option ? option.dataset.price || "" : booking.dataset.price || "",
+        lang: LANG,
+        titleL: booking.dataset.titleL || "",
+        programL: option ? option.dataset.programL || "" : "",
+        priceLabelL: option ? option.dataset.priceL || "" : booking.dataset.priceL || "",
         date: field("date"),
         adults: Number(field("adults")) || 0,
         children: Number(field("children")) || 0,
@@ -332,7 +353,7 @@
       saveCart();
       track("add_to_cart", { item_name: booking.dataset.title, item_type: booking.dataset.kind });
 
-      $("[data-done-count]", done).textContent = cart.length === 1 ? "В корзине 1 позиция." : `В корзине позиций: ${cart.length}.`;
+      $("[data-done-count]", done).textContent = cart.length === 1 ? t("В корзине 1 позиция.") : t("В корзине позиций: {0}.", cart.length);
       formWrap.hidden = true;
       done.hidden = false;
       wrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -386,19 +407,21 @@
       };
 
       const body = el("div", "cart-item-body");
-      const title = el("a", "cart-item-title", item.title);
-      title.href = item.url;
+      const same = item.lang === LANG; // подписи на языке страницы, если товар добавлен на этом же языке
+      const title = el("a", "cart-item-title", (same && item.titleL) || item.title);
+      title.href = L(item.url);
       const meta = el("p", "cart-item-meta", [
-        item.program,
+        (same && item.programL) || item.program,
         item.date ? formatDate(item.date) : "",
-        item.duration ? `срок: ${item.duration}` : "",
-        item.adults || item.children ? `взрослые ${item.adults}, дети ${item.children}` : ""
+        item.duration ? t("срок: {0}", item.duration) : "",
+        item.adults || item.children ? t("взрослые {0}, дети {1}", item.adults, item.children) : ""
       ].filter(Boolean).join(" · "));
       body.append(title, meta);
-      if (item.priceLabel) body.append(el("p", "cart-item-price", item.priceLabel));
+      const shownPrice = (same && item.priceLabelL) || item.priceLabel;
+      if (shownPrice) body.append(el("p", "cart-item-price", shownPrice));
       if (item.comment) body.append(el("p", "cart-item-comment", item.comment));
 
-      const remove = el("button", "icon-remove", "Удалить");
+      const remove = el("button", "icon-remove", t("Удалить"));
       remove.type = "button";
       remove.addEventListener("click", () => {
         cart = cart.filter((entry) => entry.uid !== item.uid);
@@ -414,7 +437,7 @@
 
   function buildMessage(orderId, customer) {
     const lines = [
-      `Заявка с сайта Niko Phuket №${orderId}`,
+      `Заявка с сайта Niko Phuket №${orderId}${LANG === "ru" ? "" : ` (язык сайта: ${LANG.toUpperCase()})`}`,
       "",
       `Клиент: ${customer.name}`,
       `Телефон: ${customer.phone}`,
@@ -450,13 +473,13 @@
   }
 
   function showFailure(note) {
-    note.replaceChildren(document.createTextNode("Не удалось отправить заявку. Попробуйте ещё раз или напишите нам напрямую: "));
+    note.replaceChildren(document.createTextNode(`${t("Не удалось отправить заявку. Попробуйте ещё раз или напишите нам напрямую:")} `));
     const links = [
       config.whatsapp && ["WhatsApp", `https://wa.me/${config.whatsapp}`],
       config.telegram && ["Telegram", `https://t.me/${config.telegram}`]
     ].filter(Boolean);
     links.forEach(([label, href], index) => {
-      if (index) note.append(" или ");
+      if (index) note.append(` ${t("или")} `);
       const link = el("a", "", label);
       link.href = href;
       link.target = "_blank";
@@ -507,7 +530,7 @@
       if (sending || !cart.length) return;
 
       const phone = checkout.elements.phone;
-      phone.setCustomValidity(phone.value.replace(/\D/g, "").length >= 7 ? "" : "Укажите номер телефона с кодом страны");
+      phone.setCustomValidity(phone.value.replace(/\D/g, "").length >= 7 ? "" : t("Укажите номер телефона с кодом страны"));
       if (!checkout.checkValidity()) {
         checkout.reportValidity();
         return;
@@ -529,7 +552,7 @@
 
       sending = true;
       submit.disabled = true;
-      submit.textContent = "Отправляем…";
+      submit.textContent = t("Отправляем…");
       note.textContent = "";
       note.classList.remove("is-error");
 
@@ -567,11 +590,11 @@
       } catch (error) {
         console.error("Отправка заявки не удалась", error);
         showFailure(note);
-        note.append(el("small", "error-code", ` (код: ${String(error && error.message || error).slice(0, 80)})`));
+        note.append(el("small", "error-code", ` (${t("код: {0}", String(error && error.message || error).slice(0, 80))})`));
       } finally {
         sending = false;
         submit.disabled = false;
-        submit.textContent = "Отправить заявку";
+        submit.textContent = t("Отправить заявку");
       }
     });
 
@@ -613,14 +636,14 @@
     };
 
     const cardHtml = (item) => `<article class="card">
-      <a class="card-media" href="${esc(item.u)}" tabindex="-1" aria-hidden="true">${item.i
+      <a class="card-media" href="${esc(L(item.u))}" tabindex="-1" aria-hidden="true">${item.i
         ? `<img src="${esc(item.i)}" alt="" width="800" height="600" loading="lazy" />`
         : `<span class="cover cover-${esc(item.g)}"><i>${esc(item.e)}</i></span>`}${item.b ? `<span class="badge">${esc(item.b)}</span>` : ""}</a>
       <div class="card-body">
         <p class="card-tag">${esc(item.l)}</p>
-        <h3 class="card-title"><a href="${esc(item.u)}">${esc(item.t)}</a></h3>
+        <h3 class="card-title"><a href="${esc(L(item.u))}">${esc(item.t)}</a></h3>
         <p class="card-text">${esc(item.o)}</p>
-        <div class="card-foot">${item.p ? `<p class="card-price"><small>от</small> ${money(item.p)} <small>${esc(item.n)}</small></p>` : '<p class="card-price">Цена по запросу</p>'}${item.d ? `<span class="card-meta">${esc(item.d)}</span>` : ""}</div>
+        <div class="card-foot">${item.p ? `<p class="card-price"><small>${t("от")}</small> ${money(item.p)} <small>${esc(item.n)}</small></p>` : `<p class="card-price">${t("Цена по запросу")}</p>`}${item.d ? `<span class="card-meta">${esc(item.d)}</span>` : ""}</div>
       </div></article>`;
 
     function showNode(id) {
@@ -630,7 +653,7 @@
       elQuestion.textContent = node.q;
       elHint.textContent = node.hint || "";
       elHint.hidden = !node.hint;
-      elStep.textContent = `Вопрос ${path.length + 1}`;
+      elStep.textContent = t("Вопрос {0}", path.length + 1);
       backBtn.hidden = path.length === 0;
       elAnswers.replaceChildren();
 
@@ -682,7 +705,7 @@
       const oldMore = $("[data-quiz-more]", result);
       if (oldMore) oldMore.remove();
       if (rest.length) {
-        const more = el("button", "btn btn-ghost", `Показать ещё ${rest.length}`);
+        const more = el("button", "btn btn-ghost", t("Показать ещё {0}", rest.length));
         more.type = "button";
         more.dataset.quizMore = "";
         more.addEventListener("click", () => {
@@ -695,7 +718,7 @@
       const note = $("[data-quiz-note]", result);
       note.textContent = notes.filter(Boolean).join(" ");
       note.hidden = !note.textContent;
-      $("[data-quiz-title]", result).textContent = first.length > 1 ? "Подходят вам" : "Подходит вам";
+      $("[data-quiz-title]", result).textContent = first.length > 1 ? t("Подходят вам") : t("Подходит вам");
       stage.hidden = true;
       result.hidden = false;
       track("quiz_complete", { results: first.map((i) => i.s).join(","), flags: [...active].join(","), theme: themeOf() || "" });

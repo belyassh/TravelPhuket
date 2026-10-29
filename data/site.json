@@ -67,5 +67,9 @@
       "/img/hero-maya.jpg"
     ]
   },
-  "officeHours": "12:00–20:00"
+  "officeHours": "12:00–20:00",
+  "languages": [
+    "ru",
+    "kk"
+  ]
 }

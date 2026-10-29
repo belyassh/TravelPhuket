@@ -17,6 +17,16 @@ const site = readJson("data", "site.json");
 const SITE_URL = site.url.replace(/\/$/, "");
 const TODAY = new Date().toISOString().slice(0, 10);
 
+/* ---------- языки ---------- */
+
+const i18n = require("./i18n.cjs");
+const LANG_LIST = (site.languages || [i18n.DEFAULT_LANG]).filter((code) => i18n.LANGS[code]);
+const dicts = i18n.loadDictionaries(ROOT, LANG_LIST);
+let CUR = i18n.DEFAULT_LANG; // язык страницы, которая строится сейчас
+const tr = (text) => (CUR === i18n.DEFAULT_LANG ? text : dicts[CUR]?.tr(text) ?? text);
+const missingByLang = new Map();
+const LANG_NOTE = "Подробное описание программы пока доступно на русском. Если нужна помощь, напишите нам в WhatsApp или Telegram.";
+
 /* ---------- helpers ---------- */
 
 const esc = (value) => String(value ?? "")
@@ -33,6 +43,14 @@ function write(rel, content) {
   const target = path.join(DIST, rel);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, content);
+}
+
+/** Страница в текущем языке: перевод через словарь и запись в /<язык>/… */
+function emitPage(rel, html, { ruOnly = false } = {}) {
+  if (ruOnly && CUR !== i18n.DEFAULT_LANG) return;
+  if (!missingByLang.has(CUR)) missingByLang.set(CUR, new Map());
+  const out = i18n.localize(html, { lang: CUR, rel, languages: LANG_LIST, siteUrl: SITE_URL, dict: dicts, missing: missingByLang.get(CUR), langNote: CUR === i18n.DEFAULT_LANG ? "" : dicts[CUR]?.tr(LANG_NOTE) ?? "" });
+  write(CUR === i18n.DEFAULT_LANG ? rel : `${CUR}/${rel}`, out);
 }
 
 function copyDir(from, to) {
@@ -60,6 +78,7 @@ const ICONS = {
   users: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20M10 11.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5ZM20 20v-1.5a3.5 3.5 0 0 0-2.5-3.35M15.5 5.2a3.25 3.25 0 0 1 0 6.1"/></svg>',
   pulse: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg>',
   ig: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3Zm4.5 5.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0c2.5-2.4 3.8-5.4 3.8-9S14.5 5.4 12 3m0 18c-2.5-2.4-3.8-5.4-3.8-9S9.5 5.4 12 3M3.5 9h17M3.5 15h17"/></svg>',
   pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/></svg>'
 };
 
@@ -198,8 +217,24 @@ const clientConfig = {
 const ASSET_CSS = `/assets/main.css?v=${hash(read("src", "styles", "main.css"))}`;
 const ASSET_JS = `/assets/site.js?v=${hash(read("src", "scripts", "site.js"))}`;
 
+const JS_KEYS = [...read("src", "scripts", "site.js").matchAll(/\bt\("((?:[^"\\]|\\.)*)"/g)].map((m) => JSON.parse(`"${m[1]}"`));
+const jsDictFor = (lang) => {
+  const entries = dicts[lang]?.entries || {};
+  const byNorm = new Map(Object.entries(entries).map(([key, value]) => [i18n.norm(key), value]));
+  return Object.fromEntries(JS_KEYS.filter((key) => byNorm.has(i18n.norm(key))).map((key) => [key, byNorm.get(i18n.norm(key))]));
+};
+
 const excursionGroups = EXCURSION_GROUPS.filter((key) => itemsOf(key).length);
 const hasGroup = (key) => itemsOf(key).length > 0;
+
+function langSwitch(variant) {
+  if (LANG_LIST.length < 2) return "";
+  const links = LANG_LIST.map((code) => `<a role="menuitem" href="{LANG:${code}}" hreflang="${i18n.LANGS[code].hreflang}" lang="${i18n.LANGS[code].html}"${code === CUR ? ' aria-current="true"' : ""}>${esc(i18n.LANGS[code].name)}</a>`).join("");
+  return `<div class="lang-drop lang-${variant}" data-drop>
+      <button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language" data-drop-btn>${ICONS.globe}<span>${esc(i18n.LANGS[CUR].code)}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m6 9 6 6 6-6"/></svg></button>
+      <div class="lang-panel" role="menu">${links}</div>
+    </div>`;
+}
 
 function header() {
   const drop = excursionGroups.map((key) => `<a role="menuitem" href="${GROUPS[key].href}"><span aria-hidden="true">${GROUPS[key].emoji}</span>${esc(GROUPS[key].label)}</a>`).join("");
@@ -210,7 +245,8 @@ function header() {
     ${hasGroup("visa") ? `<a href="/services/#visa">Бордеран</a>` : ""}
     ${hasGroup("rental") ? `<a href="/rental/">Аренда</a>` : ""}
     <a href="/services/">Услуги</a>
-    <a class="nav-quiz" href="/quiz/">Подобрать тур</a>`;
+    <a class="nav-quiz" href="/quiz/">Подобрать тур</a>
+    ${langSwitch("menu")}`;
   const messengers = [
     igLink ? `<a class="chat-btn chat-ig" href="${igLink}" target="_blank" rel="noopener" aria-label="Instagram">${ICONS.ig}<span>Instagram</span></a>` : "",
     waLink ? `<a class="chat-btn chat-wa" href="${waLink}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">${ICONS.wa}<span>WhatsApp</span></a>` : "",
@@ -222,6 +258,7 @@ function header() {
     <a class="brand" href="/" aria-label="${esc(site.name)}: на главную"><span class="brand-sun" aria-hidden="true"></span><span class="brand-name">${esc(site.name)}</span></a>
     <nav class="main-nav" id="mainNav" aria-label="Каталог">${nav}</nav>
     <div class="header-actions">
+      ${langSwitch("bar")}
       ${messengers}
       <a class="cart-link" href="/cart.html" aria-label="Корзина">${ICONS.cart}<span class="cart-count" data-cart-count hidden>0</span></a>
       <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mainNav" data-burger><span></span><span></span></button>
@@ -270,6 +307,7 @@ function page({ title, description, path: pagePath, body, schema = [], noindex =
   <meta name="robots" content="${noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}" />
   <meta name="theme-color" content="#0f2a33" />
   <link rel="canonical" href="${canonical}" />
+  <!--HREFLANG-->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ru_RU" />
   <meta property="og:site_name" content="${esc(site.name)}" />
@@ -294,7 +332,8 @@ ${header()}
 ${body}
 </main>
 ${footer()}
-<script type="application/json" id="niko-config">${JSON.stringify(clientConfig)}</script>
+<script type="application/json" id="niko-config">${JSON.stringify({ ...clientConfig, lang: CUR })}</script>
+<script type="application/json" id="niko-i18n">${JSON.stringify(jsDictFor(CUR)).replace(/</g, "\\u003c")}</script>
 <script src="${ASSET_JS}" defer></script>
 </body>
 </html>`;
@@ -530,7 +569,7 @@ function catalogPages() {
   const excursions = items.filter((i) => i.kind === "excursion");
   const chips = groupChips(excursionGroups, "/excursions/", (k) => GROUPS[k].href);
 
-  write("excursions/index.html", catalogPage({
+  emitPage("excursions/index.html", catalogPage({
     path: "/excursions/",
     h1: "Экскурсии на Пхукете",
     lead: "Море, наземные туры и вечерние шоу. Цены для взрослых и детей в батах, выберите маршрут, дату и количество гостей.",
@@ -545,7 +584,7 @@ function catalogPages() {
 
   excursionGroups.forEach((key) => {
     const [title, description, lead] = GROUPS[key].seo;
-    write(`excursions/${GROUPS[key].href.split("/").pop()}`, catalogPage({
+    emitPage(`excursions/${GROUPS[key].href.split("/").pop()}`, catalogPage({
       path: GROUPS[key].href,
       h1: GROUPS[key].label,
       lead,
@@ -559,7 +598,7 @@ function catalogPages() {
     }));
   });
 
-  write("rental/index.html", catalogPage({
+  emitPage("rental/index.html", catalogPage({
     path: "/rental/",
     h1: "Аренда транспорта на Пхукете",
     lead: "Скутеры и автомобили с доставкой к отелю. Яхты и катамараны смотрите в разделе Premium.",
@@ -576,7 +615,7 @@ function catalogPages() {
   const servicesBody = `<section class="page-head"><div class="container">${breadcrumbs([home, { name: "Услуги" }])}<h1>Услуги: бордеран, Fast Track, трансферы</h1><p class="lead">Организованные выезды для визы, ускоренное прохождение аэропорта и частные трансферы.</p></div></section>
 ${["visa", "other"].filter(hasGroup).map((k) => `<section class="section section-flush" id="${k}"><div class="container"><h2 class="group-title">${esc(GROUPS[k].label)}</h2><div class="grid">${itemsOf(k).map((it) => card(it)).join("")}</div></div></section>`).join("")}`;
 
-  write("services/index.html", page({
+  emitPage("services/index.html", page({
     title: "Бордеран, Fast Track и трансферы на Пхукете | Niko Phuket",
     description: "Бордеран на 1 день, Fast Track в аэропорту Пхукета, частные трансферы. Цены в батах, заявка онлайн, подтверждение менеджером.",
     path: "/services/",
@@ -661,7 +700,7 @@ function bookingFields(item) {
 function bookingCard(item) {
   const options = item.options || [];
   const select = options.length
-    ? `<label class="field wide"><span>${item.raw.programs?.length ? "Программа" : "Вариант"}</span><select name="program" required data-program>${options.map((o, i) => `<option value="${esc(o.title)}" data-price="${esc(o.label)}"${i === 0 ? " selected" : ""}>${esc(o.title)}${o.label ? ` · ${esc(o.label)}` : ""}</option>`).join("")}</select></label>`
+    ? `<label class="field wide"><span>${item.raw.programs?.length ? "Программа" : "Вариант"}</span><select name="program" required data-program>${options.map((o, i) => `<option value="${esc(o.title)}" data-price="${esc(o.label)}" data-program-l="${esc(o.title)}" data-price-l="${esc(o.label)}"${i === 0 ? " selected" : ""}>${esc(o.title)}${o.label ? ` · ${esc(o.label)}` : ""}</option>`).join("")}</select></label>`
     : "";
   const priceLine = options.length && options[0].label
     ? options[0].label
@@ -673,7 +712,7 @@ function bookingCard(item) {
   <div data-booking-form-wrap>
     <p class="booking-from">${lead}</p>
     <p class="booking-price" data-price-out>${esc(priceLine)}</p>
-    <form class="booking-form" data-booking novalidate data-kind="${item.kind}" data-id="${esc(item.id)}" data-title="${esc(item.title)}" data-url="${item.url}" data-image="${esc(image(item))}" data-price="${esc(priceLine)}" data-group="${esc(GROUPS[item.group].label)}">
+    <form class="booking-form" data-booking novalidate data-kind="${item.kind}" data-id="${esc(item.id)}" data-title="${esc(item.title)}" data-title-l="${esc(item.title)}" data-url="${item.url}" data-image="${esc(image(item))}" data-price="${esc(priceLine)}" data-price-l="${esc(priceLine)}" data-group="${esc(GROUPS[item.group].label)}">
       <div class="form-grid">${select}${bookingFields(item)}</div>
       <button class="btn btn-primary btn-block" type="submit">Добавить в корзину</button>
       <p class="booking-note">Это заявка, не оплата. Менеджер подтвердит места и порядок оплаты в WhatsApp или Telegram.</p>
@@ -743,6 +782,7 @@ function detailPage(item) {
     <p class="card-tag">${esc(GROUPS[item.group].label)}${item.badge ? ` · ${esc(item.badge)}` : ""}</p>
     <h1>${esc(item.title)}</h1>
     <p class="lead">${esc(item.overview)}</p>
+    ${item.kind === "excursion" ? "<!--LANGNOTE-->" : ""}
   </div>
   ${heroCover}
   ${facts.length ? `<ul class="facts-bar">${facts.map(([icon, k, v]) => `<li>${icon}<span><small>${k}</small>${esc(v)}</span></li>`).join("")}</ul>` : ""}
@@ -764,10 +804,10 @@ function detailPage(item) {
       ? { "@type": "Service", name: item.title, description: item.overview || desc[0], image: imgs, provider, areaServed: { "@type": "Place", name: "Phuket, Thailand" }, offers }
       : { "@type": "TouristTrip", name: item.title, description: item.overview || desc[0], image: imgs, touristType: "Туристы на Пхукете", provider, offers };
 
-  const priceNote = item.priceFrom ? ` ${item.fromPrice ? "От " : "Цена: "}${baht(item.priceFrom)} ${item.priceUnit}${item.childPrice ? `, дети ${baht(item.childPrice)}` : ""}.` : "";
+  const priceNote = item.priceFrom ? ` ${tr(item.fromPrice ? "От" : "Цена:")} ${baht(item.priceFrom)} ${tr(item.priceUnit)}${item.childPrice ? `, ${tr("дети")} ${baht(item.childPrice)}` : ""}.` : "";
   return page({
     title: `${item.title}: цена и заявка | ${site.name}`,
-    description: `${item.overview || desc[0] || ""}${priceNote} Заявка онлайн, подтверждение менеджером.`.replace(/\s+/g, " ").trim().slice(0, 300),
+    description: `${tr(item.overview) || desc[0] || ""}${priceNote} ${tr("Заявка онлайн, подтверждение менеджером.")}`.replace(/\s+/g, " ").trim().slice(0, 300),
     path: item.url,
     body,
     ogImage: gallery[0] ? (gallery[0].startsWith("http") ? gallery[0] : gallery[0]) : "/og.jpg",
@@ -849,7 +889,7 @@ function quizPage() {
 
   // компактный индекс позиций: карточки результатов рисуются на клиенте
   const index = items.map((i) => ({
-    s: i.slug, t: i.title, u: i.url, i: image(i), o: i.overview.slice(0, 150), p: i.priceFrom, n: i.priceUnit, d: i.duration,
+    s: i.slug, t: i.title, u: i.url, i: image(i), o: i.overview, p: i.priceFrom, n: i.priceUnit, d: i.duration,
     g: i.group, l: GROUPS[i.group].label, e: GROUPS[i.group].emoji, tg: i.tags, a: i.minAge, r: i.restrictions, k: i.rank, b: i.badge
   }));
 
@@ -892,6 +932,17 @@ function redirectPage(from, to) {
 
 /* ---------- build ---------- */
 
+function buildPages() {
+  emitPage("index.html", homePage());
+  catalogPages();
+  items.forEach((item) => emitPage(item.url.replace(/^\//, ""), detailPage(item)));
+  emitPage("cart.html", cartPage());
+  emitPage("quiz/index.html", quizPage());
+  emitPage("privacy.html", textPage("privacy.html", "Политика конфиденциальности", "/privacy.html", "Как мы обрабатываем данные, которые вы указываете в заявке."), { ruOnly: true });
+  emitPage("refund-policy.html", textPage("refund-policy.html", "Условия возврата", "/refund-policy.html", "Условия отмены, переноса и возврата для экскурсий и услуг."), { ruOnly: true });
+  emitPage("404.html", notFoundPage(), { ruOnly: true });
+}
+
 function build() {
   fs.rmSync(DIST, { recursive: true, force: true });
   copyDir(path.join(ROOT, "static"), DIST);
@@ -899,21 +950,36 @@ function build() {
   fs.copyFileSync(path.join(ROOT, "src", "styles", "main.css"), path.join(DIST, "assets", "main.css"));
   fs.copyFileSync(path.join(ROOT, "src", "scripts", "site.js"), path.join(DIST, "assets", "site.js"));
 
-  write("index.html", homePage());
-  catalogPages();
-  items.forEach((item) => write(item.url.replace(/^\//, ""), detailPage(item)));
-  write("cart.html", cartPage());
-  write("quiz/index.html", quizPage());
-  write("privacy.html", textPage("privacy.html", "Политика конфиденциальности", "/privacy.html", "Как мы обрабатываем данные, которые вы указываете в заявке."));
-  write("refund-policy.html", textPage("refund-policy.html", "Условия возврата", "/refund-policy.html", "Условия отмены, переноса и возврата для экскурсий и услуг."));
-  write("404.html", notFoundPage());
+  LANG_LIST.forEach((lang) => { CUR = lang; buildPages(); });
+  CUR = i18n.DEFAULT_LANG;
   Object.entries(site.redirects || {}).forEach(([from, to]) => write(from.replace(/^\//, ""), redirectPage(from, to)));
 
   const urls = ["/", "/excursions/", ...excursionGroups.map((k) => GROUPS[k].href), "/rental/", "/services/", "/quiz/", ...items.map((i) => i.url), "/privacy.html", "/refund-policy.html"];
-  write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${SITE_URL}${u}</loc><lastmod>${TODAY}</lastmod></url>`).join("\n")}\n</urlset>\n`);
-  write("robots.txt", `User-agent: *\nAllow: /\nDisallow: /cart.html\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+  const relOf = (u) => (u === "/" ? "index.html" : u.endsWith("/") ? `${u.slice(1)}index.html` : u.slice(1));
+  const entry = (u) => {
+    const rel = relOf(u);
+    const langs = i18n.RU_ONLY.has(rel) ? [i18n.DEFAULT_LANG] : LANG_LIST;
+    return langs.map((code) => {
+      const alternates = langs.length > 1
+        ? langs.map((alt) => `<xhtml:link rel="alternate" hreflang="${i18n.LANGS[alt].hreflang}" href="${SITE_URL}${i18n.localPath(alt, rel)}"/>`).join("") + `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${i18n.localPath(i18n.DEFAULT_LANG, rel)}"/>`
+        : "";
+      return `  <url><loc>${SITE_URL}${i18n.localPath(code, rel)}</loc><lastmod>${TODAY}</lastmod>${alternates}</url>`;
+    }).join("\n");
+  };
+  write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.map(entry).join("\n")}\n</urlset>\n`);
+  write("robots.txt", `User-agent: *\nAllow: /\nDisallow: /cart.html\nDisallow: /*/cart.html\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
-  console.log(`Собрано: ${urls.length + 3} страниц, позиций в каталоге: ${items.length} -> dist/`);
+  // что осталось без перевода: i18n/missing/<язык>.txt (по убыванию частоты)
+  fs.mkdirSync(path.join(ROOT, "i18n", "missing"), { recursive: true });
+  const report = [];
+  missingByLang.forEach((map, lang) => {
+    if (lang === i18n.DEFAULT_LANG) return;
+    const list = [...map.entries()].filter(([text]) => !/[әғқңөұүһі]/.test(text) && !Object.values(i18n.LANGS).some((l) => l.name === text)).sort((a, b) => b[1] - a[1]);
+    fs.writeFileSync(path.join(ROOT, "i18n", "missing", `${lang}.txt`), list.map(([text, n]) => `${n}\t${text}`).join("\n") + "\n");
+    report.push(`${lang}: без перевода ${list.length}`);
+  });
+
+  console.log(`Собрано: ${urls.length * LANG_LIST.length + 3} страниц (${LANG_LIST.join(", ")}), позиций в каталоге: ${items.length} -> dist/${report.length ? ` · ${report.join(", ")}` : ""}`);
 }
 
 build();
